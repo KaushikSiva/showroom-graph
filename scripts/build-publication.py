@@ -20,8 +20,8 @@ OUT = ROOT / 'publication'
 VARIANTS = ['live-video', 'ambiguous-coworker', 'qoder-neo4j']
 EXCLUDE_DIRS = {'node_modules', '.venv', '.git', 'data', '__pycache__', '.pytest_cache', 'dist', 'raw', 'raw-capture', 'live-raw', 'live-cdp-raw', 'approved-save-raw', '.capture', '.ambi'}
 EXCLUDE_SUFFIX = {'.log', '.pyc', '.webm', '.tsbuildinfo'}
-SOURCE_DIRS = ['backend', 'frontend', 'scripts', 'tooling', 'docs', 'artifacts']
-ROOT_FILES = ['README.md', '.env.example', '.gitignore', 'docker-compose.yml', 'compose.yaml', 'LICENSE']
+SOURCE_DIRS = ['backend', 'frontend', 'scripts', 'tooling', 'docs', 'artifacts', 'deploy']
+ROOT_FILES = ['README.md', '.env.example', '.gitignore', 'docker-compose.yml', 'compose.yaml', 'LICENSE', 'Dockerfile', '.dockerignore', 'render.yaml']
 
 def include(path: Path):
     rel = path.relative_to(ROOT)

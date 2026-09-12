@@ -8,6 +8,11 @@ from backend import discovery, main
 from backend.test_main import client, room
 
 
+@pytest.fixture(autouse=True)
+def isolated_search_cache(monkeypatch):
+    monkeypatch.setattr(discovery, 'SEARCH_CACHE', discovery.AsyncTTLCache())
+
+
 def listing(**changes):
     result={'url':'https://www.amazon.com/Table/dp/B012345678/ref=test','title':'Oak side table','text':'Current price $49.99. Dimensions: 20 x 20 x 18 inches.',
             'summary':json.dumps({'name':'Oak side table','category':'table','price':49.99,'currency':'USD','price_quote':'Current price $49.99.','dimensions':'20 x 20 x 18 inches'})}
@@ -39,7 +44,8 @@ def test_exa_contract_deduplicates_and_preserves_unknown_prices(monkeypatch):
     monkeypatch.setattr(discovery.httpx,'AsyncClient',Client)
     products,query=asyncio.run(discovery.search_amazon('fake-key','side table',{'budget':500,'preferences':['warm']}))
     assert len(products)==2 and products[1]['price'] is None
-    assert observed['json']['includeDomains']==['amazon.com'] and observed['json']['contents']['maxAgeHours']==0
+    assert observed['json']['includeDomains']==['amazon.com'] and observed['json']['contents']['maxAgeHours']==6
+    assert observed['json']['numResults']==4 and observed['json']['type']=='fast'
     assert observed['headers']=={'x-api-key':'fake-key'} and '500.00' in query
     limited,_=asyncio.run(discovery.search_amazon('fake-key','side table under $20',{'budget':500,'preferences':['warm']}))
     assert len(limited)==1 and limited[0]['price'] is None

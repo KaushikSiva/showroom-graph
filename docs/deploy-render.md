@@ -1,0 +1,34 @@
+# Deploy SHOWROOM on Render
+
+The production Docker image serves the React frontend, Python API and Reactor WASM runtime on one HTTPS origin. `PORT` controls the listening port. SQLite state and uploads use `/var/data/showroom`; a private Neo4j service uses its own `/data` disk. The hosted studio requires HTTP Basic sign-in (username `showroom`) because it can use paid APIs and read the connected Ambiguous workspace.
+
+The reviewed [Render Blueprint](../render.yaml) creates:
+
+| Service | Plan | Persistent disk | Base monthly cost |
+| --- | --- | --- | --- |
+| SHOWROOM web/API | 0.5 CPU, 512 MB | 1 GB | $7 + $0.25 |
+| Private Neo4j | 1 CPU, 2 GB | 1 GB | $25 + $0.25 |
+
+About **$32.50/month**, excluding provider API usage, excess bandwidth/build usage, tax, and any existing workspace subscription. Rates were checked September 12, 2026 against [Render pricing](https://render.com/pricing). Disks require paid services; free ephemeral hosting would lose room and graph data on restarts. See [persistent disk behavior](https://render.com/docs/disks).
+
+For Dashboard deployment, create a Blueprint from the canonical [SHOWROOM repository](https://github.com/KaushikSiva/showroom) and enter the four provider keys when prompted. Render generates private passwords and connects the graph hostname/password between services. Obtain the generated studio password from the web service's private environment settings.
+
+For the authorized API deployment, put `RENDER_API_KEY` in the ignored local `.env`, then run:
+
+```sh
+.venv/bin/python scripts/deploy-render.py --deploy
+```
+
+The helper creates the two services only after checking access and required provider keys. It generates separate `RENDER_NEO4J_PASSWORD` and `RENDER_STUDIO_PASSWORD` values in local `.env`, leaving the local Neo4j password unchanged. The Render control key and Qoder token are never sent to the running service. The helper preserves service/deploy IDs in ignored runtime storage and refuses to overwrite an unrelated existing service. If multiple workspaces are available, set `RENDER_OWNER_ID` explicitly.
+
+After Render finishes building, verify public health, authenticated frontend and WASM delivery, anonymous access rejection, Neo4j recommendations and repeat-search cache behavior. Repository publication alone does not prove a completed deployment. Clips saved on localhost stay on that browser origin; the Render site maintains its own browser clip storage. No previous local room uploads or workspace data are automatically copied to Render.
+
+Local production verification:
+
+```sh
+docker build -t showroom-render:local .
+docker build -t showroom-neo4j-render:local -f deploy/neo4j/Dockerfile .
+.venv/bin/python scripts/verify-render-local.py
+```
+
+The check uses isolated containers, a private Docker network and temporary data. It supplies no provider keys and verifies sign-in, graph connectivity, static runtime delivery and room persistence across a restart.

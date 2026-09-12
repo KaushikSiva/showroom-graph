@@ -66,3 +66,7 @@ Its 33 backend/frontend source files have SHA-256:
 `3e930219a14e899ebe53a50bbddf7237f936b11712ea773cf73bad5e14127b4b`
 
 The original deck and two-minute pitch recording remain historical sprint artifacts. Public packages include the new screenshots and sanitized receipts. Private recordings remain outside Git and publication packages. All three standalone repository updates use staged-byte credential scans and compare their remote trees with the reviewed package bytes.
+
+## Search latency and Render packaging — September 12, 2026
+
+The updated source digest is `8545a80dac3b7c42c78f0e597a2e329c62bb4b6b07293d529926b6055c883778` across 37 backend/frontend files. The backend suite passes 46 tests. Real visual search measured 14,829 ms cold and 45 ms for the identical warm request; this is a repeat-request cache result, not a guarantee for new searches. See [the live receipt](search-latency-live.json). Isolated production containers passed authentication, Neo4j connectivity, static WASM delivery and persistence after restart; see [the container receipt](render-local-verification.json). Hosted deployment is not yet claimed by this packaging check.

@@ -20,6 +20,8 @@ Maximize the room and keep typing or dictating directions. Pause holds the visib
 
 Click furniture directly in a live, paused or saved frame to inspect visually similar Amazon matches. New live sessions record locally; **Save & rewind** opens a seekable replay, and **Download video** keeps a separate file. Clips persist in this browser. [Frame shopping and recording evidence](../../docs/evidence/video-shopping.md).
 
+Search requests four Amazon results, reuses cached content and includes visible brand markings, colors and item types in matching. [Measured cache latency](../../docs/evidence/search-latency-live.json). [Render hosting setup](../../docs/deploy-render.md).
+
 ## Run and inspect
 
 See [QUICKSTART](../../README.md) for Python/FastAPI, React and local Neo4j startup. Frontend: **http://localhost:5190**. Backend: **http://localhost:8190**. Credentials remain server-side in ignored `.env`.

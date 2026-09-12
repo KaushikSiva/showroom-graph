@@ -40,7 +40,7 @@ cd frontend && npm run build && cd ..
 node scripts/verify-sdk-runtime.cjs
 ```
 
-The backend suite currently passes **37 tests**, including five authored by authenticated Qoder CLI 1.1.51. The browser smoke uses actual HTTP/application behavior and creates a local test room. It never clicks external approval; an explicit network route also blocks external-export API calls. If keys are configured, missing-credential tests are skipped rather than starting a paid session. It requires Neo4j connectivity.
+The backend suite currently passes **46 tests**, including five authored by authenticated Qoder CLI 1.1.51. The browser smoke uses actual HTTP/application behavior and creates a local test room. It never clicks external approval; an explicit network route also blocks external-export API calls. If keys are configured, missing-credential tests are skipped rather than starting a paid session. It requires Neo4j connectivity.
 
 Detailed local graph/HTTP results: [http-verification.json](http-verification.json). Browser results: [browser-verification.json](browser-verification.json), with desktop, mobile and approval-review screenshots. Production SDK initialization: [wasm-verification.json](wasm-verification.json). These checks demonstrate local SDK readiness, not live provider acceptance or generated video.
 
@@ -65,3 +65,7 @@ The completed follow-up adds fullscreen direction entry, frame hold with actual 
 ## Frame shopping and saved video
 
 Click-to-search and automatic browser recording extend the existing journey. See [recording and frame-shopping verification](video-shopping.md) for source identification, Amazon matches, seekable downloads, reload recovery and their limits.
+
+## Search latency and hosting preparation
+
+[Measured search caching](search-latency-live.json) reduced the repeated identical frame request from 14,829 ms to 45 ms in one actual OpenAI/Exa test. This is a warm-cache measurement, not a guarantee for new searches. The first request still waited for provider extraction. Search now requests four results, allows six-hour page reuse and caches successful results for fifteen minutes; frame descriptions have a ten-minute cache. Cache isolation, expiry, cancellation, concurrency and attribute ranking have dedicated tests. Hosted packaging and its private access gate are documented in the [Render guide](../deploy-render.md).

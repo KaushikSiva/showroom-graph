@@ -8,6 +8,7 @@ import os
 import re
 import sqlite3
 import threading
+import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,7 +23,8 @@ from neo4j import GraphDatabase
 from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel, Field
 from backend.discovery import search_amazon, transcribe_audio
-from backend.vision import identify_furniture
+from backend.vision import identify_furniture, rank_visual_matches
+from backend.hosting import install_access_gate
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = Path(os.environ.get("SHOWROOM_DATA_DIR", ROOT / "backend/data"))
@@ -105,7 +107,7 @@ def kept_categories(room):
 
 
 def graph_driver():
-    return GraphDatabase.driver(setting("NEO4J_URI", "bolt://localhost:7687"), auth=(setting("NEO4J_USER", "neo4j"), setting("NEO4J_PASSWORD", "showroom-local-dev")), connection_timeout=2, connection_acquisition_timeout=3, max_transaction_retry_time=2)
+    return GraphDatabase.driver(setting("NEO4J_URI", f"bolt://{setting('NEO4J_HOST', 'localhost')}:7687"), auth=(setting("NEO4J_USER", "neo4j"), setting("NEO4J_PASSWORD", "showroom-local-dev")), connection_timeout=2, connection_acquisition_timeout=3, max_transaction_retry_time=2)
 
 
 def rank_products(room, candidates=None):
@@ -179,6 +181,7 @@ class ExportInput(BaseModel):
 
 
 app = FastAPI(title="SHOWROOM", version="0.1.0")
+install_access_gate(app)
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5190", "http://127.0.0.1:5190"], allow_methods=["GET", "POST", "PATCH"], allow_headers=["Content-Type"])
 app.mount("/uploads", StaticFiles(directory=DATA / "uploads"), name="uploads")
 
@@ -277,8 +280,11 @@ async def visual_search(room_id: str, file: UploadFile = File(...), x: float = F
     room = get_room(room_id)
     before = fingerprint(room)
     content = await file.read(8 * 1024 * 1024 + 1)
-    selection = await identify_furniture(setting("OPENAI_API_KEY"), content, x, y)
-    products, query = await search_amazon(setting("EXA_API_KEY"), selection["query"], room)
+    started = time.perf_counter()
+    vision_metrics, search_metrics = {}, {}
+    selection = await identify_furniture(setting("OPENAI_API_KEY"), content, x, y, vision_metrics)
+    products, query = await search_amazon(setting("EXA_API_KEY"), selection["query"], room, search_metrics)
+    graph_started = time.perf_counter()
     for product in products:
         product["tags"] = [tag for tag in tags_for(room) if tag in product["name"].lower()]
     with LOCK:
@@ -287,8 +293,9 @@ async def visual_search(room_id: str, file: UploadFile = File(...), x: float = F
         products, graph = rank_products(room, products)
     if not products:
         raise HTTPException(404, f"Identified {selection['label']}, but no Amazon matches fit your current budget and keep constraints. Try another piece or adjust the brief.")
+    products = rank_visual_matches(products, selection)
     # Inspecting a piece does not replace the approved shopping list or saved brief.
-    return {"selection":selection, "products":products, "graph":graph, "query":query}
+    return {"selection":selection, "products":products, "graph":graph, "query":query, "performance":{"vision":vision_metrics,"search":search_metrics,"graph_ms":round((time.perf_counter()-graph_started)*1000,2),"total_ms":round((time.perf_counter()-started)*1000,2)}}
 
 
 @app.post("/api/rooms/{room_id}/recommendations")
@@ -296,8 +303,9 @@ async def recommend(room_id: str, body: RecommendationInput = RecommendationInpu
     room = get_room(room_id)
     before = fingerprint(room)
     candidates = None
+    search_metrics = {}
     if body.source == "amazon":
-        candidates, query = await search_amazon(setting("EXA_API_KEY"), body.query, room)
+        candidates, query = await search_amazon(setting("EXA_API_KEY"), body.query, room, search_metrics)
         excluded = kept_categories(room)
         candidates = [p for p in candidates if p['category'] not in excluded and not any(alias in p['name'].lower() for category in excluded for alias in {'sofa':['sofa','couch','loveseat'],'table':['table'],'rug':['rug','carpet'],'lighting':['lamp','lighting']}.get(category,[]))]
         for p in candidates:
@@ -313,7 +321,7 @@ async def recommend(room_id: str, body: RecommendationInput = RecommendationInpu
         room["unpriced_count"] = sum(p["price"] is None for p in room["products"])
         room["product_source"] = body.source
         if body.source == "amazon":
-            room["search"] = {"query":query,"provider":"exa","domain":"amazon.com","retrieved_at":now()}
+            room["search"] = {"query":query,"provider":"exa","domain":"amazon.com","retrieved_at":now(),"performance":search_metrics}
             room["graph"]["explanation"] += " Amazon listings were retrieved through Exa. Only source-quoted prices enter the subtotal; missing prices require checking Amazon."
         return save_room(room)
 
@@ -520,3 +528,8 @@ async def perform_export(room_id: str, body: ExportInput):
         save_room(room)
         with db() as con: con.execute("UPDATE approvals SET body=? WHERE id=?",(json.dumps(approval),body.approval_id))
     return {"exports":approval["exports"],"room":room}
+
+
+# Last route: production frontend and pinned Reactor runtime share the API origin.
+if (ROOT / "frontend/dist/index.html").is_file():
+    app.mount("/", StaticFiles(directory=ROOT / "frontend/dist", html=True), name="frontend")

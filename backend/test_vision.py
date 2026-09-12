@@ -9,6 +9,11 @@ from backend import main, vision
 from backend.test_main import client, room
 
 
+@pytest.fixture(autouse=True)
+def isolated_vision_cache(monkeypatch):
+    monkeypatch.setattr(vision, 'VISION_CACHE', vision.AsyncTTLCache())
+
+
 def frame():
     out=io.BytesIO();Image.new('RGB',(640,360),'tan').save(out,'JPEG');return out.getvalue()
 
@@ -28,7 +33,7 @@ def test_vision_contract_and_uncertain_selection(monkeypatch):
         async def __aexit__(self,*args):pass
         async def post(self,url,**kwargs):
             observed.update(url=url,**kwargs)
-            value={'found':found,'label':'Oak table','query':'round natural oak side table' if found else ''}
+            value={'found':found,'label':'Oak table','item_type':'side table' if found else '', 'colors':['brown'],'material':'oak','shape':'round','brand':'','brand_evidence':'','brand_confidence':'none'}
             return httpx.Response(200,json={'output':[{'type':'message','content':[{'type':'output_text','text':json.dumps(value)}]}]})
     monkeypatch.setattr(vision.httpx,'AsyncClient',Client)
     result=asyncio.run(vision.identify_furniture('test-key',frame(),.5,.5))
@@ -37,6 +42,7 @@ def test_vision_contract_and_uncertain_selection(monkeypatch):
     assert observed['json']['store'] is False and observed['json']['text']['format']['strict'] is True
     assert observed['json']['input'][0]['content'][1]['image_url'].startswith('data:image/jpeg;base64,')
     found=False
+    vision.VISION_CACHE.clear()
     with pytest.raises(HTTPException) as error:asyncio.run(vision.identify_furniture('test-key',frame(),.5,.5))
     assert error.value.status_code==422
 
