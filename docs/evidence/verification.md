@@ -40,7 +40,7 @@ cd frontend && npm run build && cd ..
 node scripts/verify-sdk-runtime.cjs
 ```
 
-The backend suite currently passes **46 tests**, including five authored by authenticated Qoder CLI 1.1.51. The browser smoke uses actual HTTP/application behavior and creates a local test room. It never clicks external approval; an explicit network route also blocks external-export API calls. If keys are configured, missing-credential tests are skipped rather than starting a paid session. It requires Neo4j connectivity.
+The backend suite currently passes **52 tests**, including five authored by authenticated Qoder CLI 1.1.51. The browser smoke uses actual HTTP/application behavior and creates a local test room. It never clicks external approval; an explicit network route also blocks external-export API calls. If keys are configured, missing-credential tests are skipped rather than starting a paid session. It requires Neo4j connectivity.
 
 Detailed local graph/HTTP results: [http-verification.json](http-verification.json). Browser results: [browser-verification.json](browser-verification.json), with desktop, mobile and approval-review screenshots. Production SDK initialization: [wasm-verification.json](wasm-verification.json). These checks demonstrate local SDK readiness, not live provider acceptance or generated video.
 
@@ -75,3 +75,7 @@ Click-to-search and automatic browser recording extend the existing journey. See
 [The hosted studio](https://showroom-q4s4.onrender.com) is live with a password gate and private persistent Neo4j. [Hosted HTTP checks](render-http-verification.json) verify graph-based recommendations, Ambiguous reads, actual OpenAI/Exa visual search and a repeat request using both caches (198 ms end-to-end, 16.5 s cold). [Browser checks](render-browser-verification.json) verify desktop/mobile with no page errors or horizontal overflow. The hosted Orbis attempt returned an honest 429 capacity error for the account’s occupied single-session quota; no hosted frames are claimed. No new external documents were written.
 
 The deck now follows the requested sequence: hero + SHOWROOM only; problem / why; demo-video placeholder; Ambiguous / OpenAI / Exa / Neo4j / Qoder / VISKO architecture; deployed Render QR code. Qoder’s contribution is explicitly development/testing. The QR was decoded from the rendered final slide to verify its destination. The PDF has exactly five pages; the existing two-minute MP4 remains the historical demo.
+
+## Automatic document sharing
+
+The 52-test backend suite includes six sharing cases: recipient binding and approval, concurrent saves, uncertain invitation recovery, rejected-request retry, content-verification gating, and sharing readback recovery. [Browser verification](sharing-browser.json) uses intercepted API responses to prove recipient disclosure, failure/retry, pending/confirmed states and mobile layout. [Actual permission readback](sharing-provider-readback.json) validates the helper against the three previously authorized invitations without creating documents or sending more invitations.

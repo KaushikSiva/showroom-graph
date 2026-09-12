@@ -36,3 +36,5 @@ docker build -t showroom-neo4j-render:local -f deploy/neo4j/Dockerfile .
 ```
 
 The check uses isolated containers, a private Docker network and temporary data. It supplies no provider keys and verifies sign-in, graph connectivity, static runtime delivery and room persistence across a restart.
+
+Set `SHOWROOM_SHARE_EMAIL` in the Render web service environment to automatically share new approved documents with that recipient. The deployment helper includes this optional value from local `.env` when creating a service. The review screen discloses the recipient before approval. Keep the address out of public configuration files; `.env.example` intentionally leaves it blank. Sharing gives document viewer access and does not add workspace members.

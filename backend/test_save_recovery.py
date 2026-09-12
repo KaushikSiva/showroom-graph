@@ -72,7 +72,7 @@ def test_provider_rejection_preserves_sanitized_status(client, monkeypatch):
         async def __aenter__(self): return self
         async def __aexit__(self, *args): pass
         async def request(self, *args, **kwargs): return response
-    monkeypatch.setattr(main, 'setting', lambda *args: key)
+    monkeypatch.setattr(main, 'setting', lambda name, default='': key if name=='AMBIGUOUS_API_KEY' else default)
     monkeypatch.setattr(main.httpx, 'AsyncClient', ProviderClient)
     with pytest.raises(main.ProviderHTTPError) as caught:
         asyncio.run(main.provider_request('ambiguous', 'POST', '/api/documents', json={}))

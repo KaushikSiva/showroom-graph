@@ -6,7 +6,7 @@
 
 SHOWROOM brings a room photo, a spending limit, live visual direction and a sourced shopping list into one workspace. The intended journey is: upload a room → set preferences and what stays → start Orbis → steer twice → inspect products → approve an Ambiguous design brief and shopping-list handoff.
 
-**Verified:** real Orbis frames and two visibly different directions; live Neo4j recommendations; 46 backend tests, including five written by Qoder. An approved Ambiguous document containing the exact brief and $219.97 shopping list was saved and read back successfully. [Inspect the saved document](https://app.ambiguous.ai/docs/4adbc629-1359-4b19-bb75-74e9f38d26a3) (workspace access required); see [save evidence](docs/evidence/approved-save.json).
+**Verified:** real Orbis frames and two visibly different directions; live Neo4j recommendations; 52 backend tests, including five written by Qoder. An approved Ambiguous document containing the exact brief and $219.97 shopping list was saved and read back successfully. [Inspect the saved document](https://app.ambiguous.ai/docs/4adbc629-1359-4b19-bb75-74e9f38d26a3) (workspace access required); see [save evidence](docs/evidence/approved-save.json).
 
 ![Actual live SHOWROOM workspace](artifacts/screenshots/live-change-2-final.png)
 
@@ -129,3 +129,7 @@ This project was created as a fresh SHOWROOM application during the sprint. It u
 ## Public repository presentations
 
 [Canonical live video](https://github.com/KaushikSiva/showroom), [Ambiguous coworker](https://github.com/KaushikSiva/showroom-coworker), and [Qoder / Neo4j](https://github.com/KaushikSiva/showroom-graph) present this same codebase with focused READMEs. See [publication status and source disclosure](docs/publication.md).
+
+### Automatic Ambiguous sharing
+
+Set the server-only `SHOWROOM_SHARE_EMAIL` to the intended recipient. New save previews show that address; approving a save authorizes viewer access to that document. The recipient is frozen in the approval, so later configuration changes cannot redirect it. The app verifies the saved content, requests an invitation and checks permissions. It displays confirmed access, a pending invitation, or a sharing problem separately from document-save success. Use **Check sharing** / **Retry sharing** on the saved result to recover without creating another document. Invitations may require the recipient to accept by email. No whole-workspace access is granted. Old approvals without a sharing recipient stay unchanged.

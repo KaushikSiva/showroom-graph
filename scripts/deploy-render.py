@@ -60,6 +60,7 @@ def main():
         host=urlparse(address if '://' in address else '//'+address).hostname
         if not host:raise RuntimeError('Invalid private graph address')
         env={k:values[k] for k in ['REACTOR_API_KEY','OPENAI_API_KEY','EXA_API_KEY','AMBIGUOUS_API_KEY']}
+        if values.get('SHOWROOM_SHARE_EMAIL'):env['SHOWROOM_SHARE_EMAIL']=values['SHOWROOM_SHARE_EMAIL']
         env.update(PORT='10000',SHOWROOM_DATA_DIR='/var/data/showroom',SHOWROOM_REQUIRE_AUTH='true',SHOWROOM_ACCESS_PASSWORD=values['RENDER_STUDIO_PASSWORD'],NEO4J_HOST=host,NEO4J_USER='neo4j',NEO4J_PASSWORD=values['RENDER_NEO4J_PASSWORD'])
         create('showroom','web_service','0.5c-512mb','./Dockerfile','/var/data',env,'/api/health')
         print('Deployment requests accepted. Poll the saved deploy IDs and verify the hosted application before claiming it is live.',flush=True)

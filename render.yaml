@@ -69,3 +69,5 @@ services:
         sync: false
       - key: AMBIGUOUS_API_KEY
         sync: false
+      - key: SHOWROOM_SHARE_EMAIL
+        sync: false

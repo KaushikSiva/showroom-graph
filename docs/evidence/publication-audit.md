@@ -74,3 +74,7 @@ The updated source digest is `8545a80dac3b7c42c78f0e597a2e329c62bb4b6b07293d5299
 ## Hosted verification and five-slide revision
 
 Both Render services are live. The public [HTTP receipt](render-http-verification.json), [browser receipt](render-browser-verification.json), [deployment guide](../deploy-render.md), revised five-page deck and rendered QR preview are included in every package. The QR contains only the HTTPS studio address. Hosted live-video verification was blocked by the occupied Orbis quota; the error is disclosed. No integration source changed after the preceding digest. The deck now supersedes the earlier sprint deck; the two-minute MP4 remains unchanged.
+
+## Automatic approved-document sharing
+
+The new source digest is `6363d8f53fc725dc6e2f56d88f0f0384d2fb4365d7e45f4b732dafea8e6f41a2` across 39 backend/frontend files. Automatic viewer sharing uses the email frozen into each new approval; the address stays in private environment configuration. The backend suite passes 52 tests, the frontend builds, and the sharing browser contract passes. [Real permission readback](sharing-provider-readback.json) confirms prior invitations without new external writes. Publication packages exclude the recipient email and the private sharing receipts.

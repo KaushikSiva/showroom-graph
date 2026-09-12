@@ -25,6 +25,7 @@ from pydantic import BaseModel, Field
 from backend.discovery import search_amazon, transcribe_audio
 from backend.vision import identify_furniture, rank_visual_matches
 from backend.hosting import install_access_gate
+from backend.sharing import share_document
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = Path(os.environ.get("SHOWROOM_DATA_DIR", ROOT / "backend/data"))
@@ -422,9 +423,13 @@ def export_preview(room_id: str):
         room = get_room(room_id)
         if not room["products"]: raise HTTPException(409,"Retrieve a shopping list before reviewing the export.")
         content, rows = export_content(room)
+        recipient = setting("SHOWROOM_SHARE_EMAIL").strip()
+        if recipient and not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", recipient):
+            raise HTTPException(503, "The configured sharing email is invalid. Correct SHOWROOM_SHARE_EMAIL on the server.")
         approval = {"approval_id":str(uuid.uuid4()),"room_id":room_id,"fingerprint":fingerprint(room),"title":f"SHOWROOM — {room['name']}","content":content,"shopping_rows":rows,"created_at":now(),"completed":False,"exports":[]}
+        approval["share_recipient"] = recipient or None
         with db() as con: con.execute("INSERT INTO approvals VALUES (?,?,?)",(approval["approval_id"],room_id,json.dumps(approval)))
-        return {k:approval[k] for k in ("approval_id","title","content","shopping_rows")}
+        return {k:approval[k] for k in ("approval_id","title","content","shopping_rows","share_recipient")}
 
 
 @app.post("/api/rooms/{room_id}/export")
@@ -472,9 +477,10 @@ async def perform_export(room_id: str, body: ExportInput):
         if not record: raise HTTPException(404,"Approval preview not found.")
         approval = json.loads(record[0])
         if not approval["exports"] and approval["fingerprint"] != fingerprint(room): raise HTTPException(409,"This room changed after review. Review a fresh export before approving.")
-        if approval["completed"]: return {"exports":approval["exports"],"room":room}
         if approval.get("write_status") in ("in_flight", "uncertain") and not approval["exports"]:
             raise HTTPException(409,"A previous save has an uncertain outcome. Inspect your Ambiguous workspace before creating another preview; automatic duplicate writes are blocked.")
+    if approval["completed"]:
+        return await finish_export_sharing(room_id, approval)
     # One approved document contains both the design brief and the complete shopping list.
     # This avoids an undocumented spreadsheet authoring schema and is inspectable via the real API.
     if not approval["exports"]:
@@ -527,7 +533,21 @@ async def perform_export(room_id: str, body: ExportInput):
         room["exports"] = [exported if e["id"]==exported["id"] else e for e in room["exports"]]
         save_room(room)
         with db() as con: con.execute("UPDATE approvals SET body=? WHERE id=?",(json.dumps(approval),body.approval_id))
-    return {"exports":approval["exports"],"room":room}
+    return await finish_export_sharing(room_id, approval)
+
+
+async def finish_export_sharing(room_id, approval):
+    def persist():
+        with LOCK:
+            room = get_room(room_id)
+            by_id = {item["id"]: item for item in approval["exports"]}
+            room["exports"] = [by_id.get(item["id"], item) for item in room["exports"]]
+            save_room(room)
+            with db() as con:
+                con.execute("UPDATE approvals SET body=? WHERE id=?", (json.dumps(approval), approval["approval_id"]))
+    for exported in approval["exports"]:
+        await share_document(exported, approval.get("share_recipient"), provider_request, persist)
+    return {"exports":approval["exports"], "room":get_room(room_id)}
 
 
 # Last route: production frontend and pinned Reactor runtime share the API origin.

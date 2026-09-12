@@ -6,7 +6,7 @@
 
 SHOWROOM models room constraints, styles, products and decisions as connected context. Neo4j relationships support inspectable recommendations, while the application retains the budget and existing furniture through successive instructions.
 
-This presentation focuses on connected memory and engineering execution. Authenticated Qoder CLI 1.1.51 authored five meaningful journey tests, all independently passing. The evidence document contains the exact task, sanitized successful CLI result, file diff and execution record. The complete backend suite passes 46 tests. The graph’s live verification status is recorded separately from any local fallback.
+This presentation focuses on connected memory and engineering execution. Authenticated Qoder CLI 1.1.51 authored five meaningful journey tests, all independently passing. The evidence document contains the exact task, sanitized successful CLI result, file diff and execution record. The complete backend suite passes 52 tests. The graph’s live verification status is recorded separately from any local fallback.
 
 ![Actual SHOWROOM workspace](../../artifacts/screenshots/desktop.png)
 
