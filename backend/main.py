@@ -15,13 +15,14 @@ from typing import Literal
 
 import httpx
 from dotenv import dotenv_values
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from neo4j import GraphDatabase
 from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel, Field
 from backend.discovery import search_amazon, transcribe_audio
+from backend.vision import identify_furniture
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = Path(os.environ.get("SHOWROOM_DATA_DIR", ROOT / "backend/data"))
@@ -269,6 +270,25 @@ def acknowledge(room_id: str, directive_id: str, body: AckInput):
 async def transcription(file: UploadFile = File(...)):
     content = await file.read(12 * 1024 * 1024 + 1)
     return await transcribe_audio(setting("OPENAI_API_KEY"), content, file.content_type or "")
+
+
+@app.post("/api/rooms/{room_id}/visual-search")
+async def visual_search(room_id: str, file: UploadFile = File(...), x: float = Form(..., ge=0, le=1), y: float = Form(..., ge=0, le=1)):
+    room = get_room(room_id)
+    before = fingerprint(room)
+    content = await file.read(8 * 1024 * 1024 + 1)
+    selection = await identify_furniture(setting("OPENAI_API_KEY"), content, x, y)
+    products, query = await search_amazon(setting("EXA_API_KEY"), selection["query"], room)
+    for product in products:
+        product["tags"] = [tag for tag in tags_for(room) if tag in product["name"].lower()]
+    with LOCK:
+        if fingerprint(get_room(room_id)) != before:
+            raise HTTPException(409, "Your brief changed during visual search. Select the piece again.")
+        products, graph = rank_products(room, products)
+    if not products:
+        raise HTTPException(404, f"Identified {selection['label']}, but no Amazon matches fit your current budget and keep constraints. Try another piece or adjust the brief.")
+    # Inspecting a piece does not replace the approved shopping list or saved brief.
+    return {"selection":selection, "products":products, "graph":graph, "query":query}
 
 
 @app.post("/api/rooms/{room_id}/recommendations")

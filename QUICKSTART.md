@@ -4,7 +4,7 @@
 
 SHOWROOM brings a room photo, a spending limit, live visual direction and a sourced shopping list into one workspace. The intended journey is: upload a room → set preferences and what stays → start Orbis → steer twice → inspect products → approve an Ambiguous design brief and shopping-list handoff.
 
-**Verified:** real Orbis frames and two visibly different directions; live Neo4j recommendations; 33 backend tests, including five written by Qoder. An approved Ambiguous document containing the exact brief and $219.97 shopping list was saved and read back successfully. [Inspect the saved document](https://app.ambiguous.ai/docs/4adbc629-1359-4b19-bb75-74e9f38d26a3) (workspace access required); see [save evidence](docs/evidence/approved-save.json).
+**Verified:** real Orbis frames and two visibly different directions; live Neo4j recommendations; 37 backend tests, including five written by Qoder. An approved Ambiguous document containing the exact brief and $219.97 shopping list was saved and read back successfully. [Inspect the saved document](https://app.ambiguous.ai/docs/4adbc629-1359-4b19-bb75-74e9f38d26a3) (workspace access required); see [save evidence](docs/evidence/approved-save.json).
 
 ![Actual live SHOWROOM workspace](artifacts/screenshots/live-change-2-final.png)
 
@@ -40,6 +40,16 @@ Furniture search defaults to **Amazon through Exa**. Add `EXA_API_KEY` to the se
 The microphone beside either input records up to 45 seconds. Stop to transcribe with OpenAI, review the text, then send the direction or run the search. Add `OPENAI_API_KEY` to `.env`. Audio goes through the backend to OpenAI's `gpt-4o-mini-transcribe`; the app does not persist recordings. Cancel discards an active recording. Permission failures leave typing available. [Actual OpenAI → Exa → Neo4j verification](docs/evidence/voice-and-player.md).
 
 Browser checks for these controls: `node scripts/test-player-controls.cjs` after installing `tooling`. This uses a mocked provider and synthetic video, never disguised as live integration evidence. The separate `node scripts/test-live-player.cjs --live` command explicitly uses one paid Orbis session and ends it after checking pause, paused steering and resume.
+
+## Shop the frame and replay your room
+
+Click a piece in the live, paused or replayed room. SHOWROOM sends that selected frame and point to OpenAI vision, then uses Exa to find visually similar Amazon products within the room brief. Matches open inside the player, including fullscreen; click a match to open Amazon. These are visual alternatives, not exact SKU identifications. Inspecting a piece does not replace the shopping list. Ambiguous/background clicks and provider failures have recoverable messages.
+
+New Orbis sessions record the room automatically in the browser, at up to 1280 pixels wide. **Save & rewind** finishes a clip and opens its replay timeline. Drag the timeline, rewind ten seconds, choose a saved clip, or **Download video**. Saving a clip does not end the Orbis session; **Return to live** brings back live direction controls, and **Record next clip** starts another recording. Ending or disconnecting a session also finalizes its recording.
+
+Clips are saved in IndexedDB on this browser and origin, not in Ambiguous or on the server. Recordings contain the room video only, with no microphone audio or interface overlays. Download a file to keep it independently of browser storage. Each clip is limited to ten minutes or approximately 120 MB; storage failures preserve the download option. Save before closing the tab. The browser chooses WebM or MP4 according to supported recording codecs. Background tabs may record fewer frames.
+
+The existing two-minute pitch video predates these controls. The new [frame-shopping and replay verification](docs/evidence/video-shopping.md) distinguishes actual provider evidence from synthetic browser tests.
 
 ## Integration access
 

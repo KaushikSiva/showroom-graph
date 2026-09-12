@@ -10,6 +10,7 @@
   "description": "",
   "dependencies": {
     "@reactor-team/js-sdk": "^3.0.2",
+    "fix-webm-duration": "^1.0.6",
     "lucide-react": "^1.45.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"

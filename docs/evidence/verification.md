@@ -40,7 +40,7 @@ cd frontend && npm run build && cd ..
 node scripts/verify-sdk-runtime.cjs
 ```
 
-The backend suite currently passes **33 tests**, including five authored by authenticated Qoder CLI 1.1.51. The browser smoke uses actual HTTP/application behavior and creates a local test room. It never clicks external approval; an explicit network route also blocks external-export API calls. If keys are configured, missing-credential tests are skipped rather than starting a paid session. It requires Neo4j connectivity.
+The backend suite currently passes **37 tests**, including five authored by authenticated Qoder CLI 1.1.51. The browser smoke uses actual HTTP/application behavior and creates a local test room. It never clicks external approval; an explicit network route also blocks external-export API calls. If keys are configured, missing-credential tests are skipped rather than starting a paid session. It requires Neo4j connectivity.
 
 Detailed local graph/HTTP results: [http-verification.json](http-verification.json). Browser results: [browser-verification.json](browser-verification.json), with desktop, mobile and approval-review screenshots. Production SDK initialization: [wasm-verification.json](wasm-verification.json). These checks demonstrate local SDK readiness, not live provider acceptance or generated video.
 
@@ -61,3 +61,7 @@ The final MP4 retains the first 100 seconds of the actual Orbis recording and ap
 ## Fullscreen, Amazon discovery and voice follow-up
 
 The completed follow-up adds fullscreen direction entry, frame hold with actual Orbis pause/resume acknowledgments, Amazon discovery through Exa and OpenAI speech transcription. Real provider calls and browser controls were verified separately; see the [feature verification record](voice-and-player.md). The original deck and two-minute demo remain the historical sprint demonstration. The new screenshots show the added controls and real Amazon results.
+
+## Frame shopping and saved video
+
+Click-to-search and automatic browser recording extend the existing journey. See [recording and frame-shopping verification](video-shopping.md) for source identification, Amazon matches, seekable downloads, reload recovery and their limits.

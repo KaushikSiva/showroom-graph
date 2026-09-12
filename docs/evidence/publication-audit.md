@@ -55,4 +55,14 @@ The subsequent feature release adds actual Orbis pause/resume, fullscreen direct
 
 `04492bb952b81ecbaeca9bb739b7a614c3ecb862396b5944817b87479bdc03d2`
 
-The current suite passes 33 backend tests. Actual provider receipts, browser checks and screenshots are linked from the [feature verification](voice-and-player.md). The original five-page PDF and two-minute MP4 remain the historical sprint artifacts. Publication rebuilding validates local Markdown links and privately scans all configured credentials; the staged-byte audit and remote tree comparison are repeated for each of the three existing repositories.
+That release passed 33 backend tests. Actual provider receipts, browser checks and screenshots are linked from the [feature verification](voice-and-player.md). The original five-page PDF and two-minute MP4 remain the historical sprint artifacts. Publication rebuilding validates local Markdown links and privately scans all configured credentials; the staged-byte audit and remote tree comparison are repeated for each of the three existing repositories.
+
+## Clickable video and recording update
+
+The next feature release adds OpenAI identification of clicked furnishings, Exa Amazon alternatives inside the player, automatic browser recording, IndexedDB clip persistence, download and seekable replay. It passes 37 backend tests, the production build, existing player controls and the new recording browser checks. A real Orbis clip was downloaded and rewound, and its selected coffee table produced actual OpenAI/Exa results; see the [feature verification](video-shopping.md).
+
+Its 33 backend/frontend source files have SHA-256:
+
+`3e930219a14e899ebe53a50bbddf7237f936b11712ea773cf73bad5e14127b4b`
+
+The original deck and two-minute pitch recording remain historical sprint artifacts. Public packages include the new screenshots and sanitized receipts. Private recordings remain outside Git and publication packages. All three standalone repository updates use staged-byte credential scans and compare their remote trees with the reviewed package bytes.

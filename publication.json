@@ -23,7 +23,7 @@
   "published_at": "2026-09-12T20:22:49.989056+00:00",
   "canonical_project": "SHOWROOM",
   "same_codebase": true,
-  "source_sha256": "04492bb952b81ecbaeca9bb739b7a614c3ecb862396b5944817b87479bdc03d2",
+  "source_sha256": "3e930219a14e899ebe53a50bbddf7237f936b11712ea773cf73bad5e14127b4b",
   "source_files": [
     "backend/API.md",
     "backend/__init__.py",
@@ -36,7 +36,9 @@
     "backend/test_qoder_journey.py",
     "backend/test_save_recovery.py",
     "backend/test_verification.py",
+    "backend/test_vision.py",
     "backend/verification.json",
+    "backend/vision.py",
     "frontend/.gitignore",
     "frontend/ASSETS.md",
     "frontend/index.html",
@@ -45,8 +47,11 @@
     "frontend/public/favicon.svg",
     "frontend/public/images/sample-room.jpg",
     "frontend/src/App.tsx",
+    "frontend/src/FrameShop.tsx",
+    "frontend/src/RecordingBar.tsx",
     "frontend/src/api.ts",
     "frontend/src/main.tsx",
+    "frontend/src/recordings.ts",
     "frontend/src/stream.ts",
     "frontend/src/style.css",
     "frontend/src/vite-env.d.ts",
@@ -54,5 +59,5 @@
     "frontend/tsconfig.json",
     "frontend/vite.config.ts"
   ],
-  "canonical_local_commit": "b6fdebab445b18a1fe4a716953684c57814fe932"
+  "canonical_local_commit": "ec0f12b76c3338e23179730f67a910a43aa5fcff"
 }

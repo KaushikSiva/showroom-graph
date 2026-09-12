@@ -43,3 +43,7 @@ Run local contract tests with `.venv/bin/python -m pytest backend -q`. Mocked pr
 `POST /api/transcriptions` accepts multipart `file` audio (WebM, MP4, MP3, WAV or Ogg), at most 12 MB, and returns `{text, provider, model}`. `OPENAI_API_KEY` remains server-side; recordings are passed in memory to OpenAI and are not persisted. The browser limits recordings to 45 seconds and lets the user review text before search/direction. Missing keys, denied access, rate limits and malformed responses are explicit errors.
 
 References: [Exa search contract](https://exa.ai/docs/reference/search-api-guide-for-coding-agents), [OpenAI transcription](https://developers.openai.com/api/docs/guides/speech-to-text).
+
+### Click-to-search
+
+`POST /api/rooms/{id}/visual-search` accepts multipart `file` (decoded image, maximum 8 MB), and normalized `x` / `y` coordinates in `[0,1]`. OpenAI Responses (`gpt-4.1-mini`, `store:false`, strict JSON output) describes the marked furnishing. Exa retrieves Amazon alternatives, and existing budget/keep/Neo4j rules rank candidates. The result contains `selection`, `products`, `graph` and `query`; it does not replace the shopping list or write an external document. A changed brief returns 409, unclear selection 422, no eligible listings 404, and provider failures remain explicit. Frames are processed transiently and are not persisted by the server. Requires the existing OpenAI and Exa keys.
