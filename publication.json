@@ -23,7 +23,7 @@
   "published_at": "2026-09-12T20:22:49.989056+00:00",
   "canonical_project": "SHOWROOM",
   "same_codebase": true,
-  "source_sha256": "67a90ac54ff9415cb7e82f58012e8564e7133422cfcbf2f8d83bee19451bd41c",
+  "source_sha256": "149c2c96f5bd049834eaa72ae98210ce3175bbb5453057c806d63167156898b8",
   "source_files": [
     "backend/API.md",
     "backend/__init__.py",
@@ -32,6 +32,7 @@
     "backend/requirements.txt",
     "backend/test_main.py",
     "backend/test_qoder_journey.py",
+    "backend/test_save_recovery.py",
     "backend/test_verification.py",
     "backend/verification.json",
     "frontend/.gitignore",
@@ -50,5 +51,5 @@
     "frontend/tsconfig.json",
     "frontend/vite.config.ts"
   ],
-  "canonical_local_commit": "22b8bbfa4e95b533561a571dd1665e5a9a068559"
+  "canonical_local_commit": "8c76ea975e95b099933c993bded03d5cdaf5860a"
 }

@@ -4,7 +4,7 @@
 
 SHOWROOM brings a room photo, a spending limit, live visual direction and a sourced shopping list into one workspace. The intended journey is: upload a room → set preferences and what stays → start Orbis → steer twice → inspect products → approve an Ambiguous design brief and shopping-list handoff.
 
-**Verified:** real Orbis frames and two visibly different directions; live Neo4j recommendations; 18 backend tests, including five written by Qoder. Ambiguous workspace reads succeed; the exact export is prepared for user approval.
+**Verified:** real Orbis frames and two visibly different directions; live Neo4j recommendations; 23 backend tests, including five written by Qoder. An approved Ambiguous document containing the exact brief and $219.97 shopping list was saved and read back successfully. [Inspect the saved document](https://app.ambiguous.ai/docs/4adbc629-1359-4b19-bb75-74e9f38d26a3) (workspace access required); see [save evidence](docs/evidence/approved-save.json).
 
 ![Actual live SHOWROOM workspace](artifacts/screenshots/live-change-2-final.png)
 

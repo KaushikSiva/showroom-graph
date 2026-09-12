@@ -260,6 +260,34 @@ def recommend(room_id: str):
         return save_room(room)
 
 
+class ProviderHTTPError(HTTPException):
+    """Keep safe upstream diagnostics without confusing rejection with transport failure."""
+    def __init__(self, status_code, detail, upstream_status, diagnostics):
+        super().__init__(status_code, detail)
+        self.upstream_status = upstream_status
+        self.diagnostics = diagnostics
+
+
+def provider_diagnostics(response, key):
+    try:
+        payload = response.json()
+    except ValueError:
+        payload = {}
+    if not isinstance(payload, dict):
+        payload = {}
+    secrets = [key] + [str(value) for name, value in dotenv_values(ROOT / ".env").items()
+                       if value and any(part in name for part in ("KEY", "TOKEN", "PASSWORD", "SECRET"))]
+    result = {"upstream_status": response.status_code}
+    for name in ("error", "code", "message", "request_id"):
+        if isinstance(payload.get(name), str):
+            value = payload[name]
+            for secret in secrets:
+                value = value.replace(secret, "[REDACTED]")
+            value = re.sub(r"Bearer\s+\S+", "Bearer [REDACTED]", value, flags=re.I)
+            result[name] = " ".join(value.split())[:1000]
+    return result
+
+
 async def provider_request(provider, method, path, **kwargs):
     key_name = "REACTOR_API_KEY" if provider == "reactor" else "AMBIGUOUS_API_KEY"
     key = setting(key_name)
@@ -273,7 +301,9 @@ async def provider_request(provider, method, path, **kwargs):
             PROVIDER_STATUS[provider] = "capacity" if response.status_code == 429 else "error"
             code = 429 if response.status_code == 429 else 503 if response.status_code in (401,403) else 502
             message = "No capacity is available. Wait briefly and retry." if code == 429 else "Access was rejected. Check the server credential and permissions." if code == 503 else "The provider could not complete this request. Retry without changing your room."
-            raise HTTPException(code, f"{provider.capitalize()}: {message}")
+            diagnostics = provider_diagnostics(response, key)
+            diagnostic = diagnostics.get("error") or diagnostics.get("code") or message
+            raise ProviderHTTPError(code, f"{provider.capitalize()} (HTTP {response.status_code}): {diagnostic}", response.status_code, diagnostics)
         PROVIDER_STATUS[provider] = "connected"
         return response.json()
     except (httpx.RequestError, ValueError):
@@ -336,6 +366,37 @@ async def export_approved(room_id: str, body: ExportInput):
         return await perform_export(room_id, body)
 
 
+@app.post("/api/rooms/{room_id}/export-reconcile")
+async def reconcile_export(room_id: str, body: ExportInput):
+    """Explicit recovery only when complete live lists prove an empty workspace.
+
+    Does not create anything. Existing/partial listings remain blocked for inspection.
+    """
+    if body.approved is not True:
+        raise HTTPException(403, "Approval is required to reconcile this reviewed export.")
+    async with EXPORT_LOCKS.setdefault(body.approval_id, asyncio.Lock()):
+        with db() as con:
+            record = con.execute("SELECT body FROM approvals WHERE id=? AND room_id=?", (body.approval_id, room_id)).fetchone()
+        if not record:
+            raise HTTPException(404, "Approval preview not found.")
+        approval = json.loads(record[0])
+        if approval.get("write_status") != "uncertain" or approval["exports"]:
+            raise HTTPException(409, "Only an uncertain save without a returned identifier can be reconciled this way.")
+        if approval["fingerprint"] != fingerprint(get_room(room_id)):
+            raise HTTPException(409, "The reviewed room changed; this recovery cannot authorize new content.")
+        receipts = []
+        for path, params in (("/api/documents", {"limit": 200}), ("/api/activity", {"resource_type": "document", "limit": 100})):
+            data = await provider_request("ambiguous", "GET", path, params=params)
+            if not isinstance(data, dict) or data.get("data") != [] or data.get("has_more") is not False or data.get("total") != 0:
+                raise HTTPException(409, "The workspace is not provably empty. Inspect existing documents; no retry has been enabled.")
+            receipts.append({"path": path, "checked_at": now(), "total": 0, "has_more": False})
+        approval["write_status"] = "reconciled_empty"
+        approval["reconciliation"] = {"reason": "Complete document and document-activity lists are empty after the failed request", "reads": receipts}
+        with db() as con:
+            con.execute("UPDATE approvals SET body=? WHERE id=?", (json.dumps(approval), body.approval_id))
+        return {"approval_id": body.approval_id, "write_status": approval["write_status"], "reconciliation": approval["reconciliation"], "external_write_performed": False}
+
+
 async def perform_export(room_id: str, body: ExportInput):
     if body.approved is not True: raise HTTPException(403,"Review and approve the exact design brief and shopping list before saving to Ambiguous.")
     with LOCK:
@@ -356,10 +417,13 @@ async def perform_export(room_id: str, body: ExportInput):
         approval["write_status"] = "in_flight"
         with db() as con: con.execute("UPDATE approvals SET body=? WHERE id=?",(json.dumps(approval),body.approval_id))
         try:
-            created = await provider_request("ambiguous","POST","/api/documents",json={"type":"doc","title":approval["title"],"content":approval["content"],"visibility":"private","labels":["showroom"]})
+            created = await provider_request("ambiguous","POST","/api/documents",json={"type":"doc","title":approval["title"],"content":approval["content"],"visibility":"restricted","labels":["showroom"]})
         except HTTPException as exc:
             # A transport/server failure can occur after the provider committed the document.
-            approval["write_status"] = "rejected" if exc.status_code in (429,503) else "uncertain"
+            upstream = getattr(exc, "upstream_status", None)
+            rejected = (400 <= upstream < 500 and upstream not in (408, 425)) if upstream else exc.status_code in (429,503)
+            approval["write_status"] = "rejected" if rejected else "uncertain"
+            approval["last_error"] = getattr(exc, "diagnostics", {"local_status": exc.status_code})
             with db() as con: con.execute("UPDATE approvals SET body=? WHERE id=?",(json.dumps(approval),body.approval_id))
             raise
         doc_id = created.get("id")

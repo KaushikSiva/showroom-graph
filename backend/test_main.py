@@ -108,6 +108,7 @@ def test_provider_failure_does_not_leak_key(client,monkeypatch):
     monkeypatch.setattr(main,'setting',lambda key,default='':'super-secret-contract-key')
     class Response:
         status_code=401
+        def json(self): raise ValueError('Non-JSON provider error')
     class FakeClient:
         def __init__(self,**kwargs):pass
         async def __aenter__(self):return self

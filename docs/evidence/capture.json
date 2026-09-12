@@ -105,10 +105,27 @@
     "relationship_count": 6
   },
   "total": 219.97,
-  "exports": [],
+  "exports": [
+    {
+      "id": "4adbc629-1359-4b19-bb75-74e9f38d26a3",
+      "title": "SHOWROOM \u2014 The living room",
+      "type": "doc",
+      "url": "https://app.ambiguous.ai/docs/4adbc629-1359-4b19-bb75-74e9f38d26a3",
+      "api_url": "https://app.ambiguous.ai/api/documents/4adbc629-1359-4b19-bb75-74e9f38d26a3",
+      "verified": true,
+      "created_at": "2026-09-12T20:35:35.854318+00:00",
+      "approval_id": "3cf68081-bc94-4fa9-abcb-1c7e1924d052",
+      "verification": "title and all authored text verified",
+      "verified_at": "2026-09-12T20:35:36.839923+00:00"
+    }
+  ],
   "live_orbis_observed": true,
   "two_visible_changes_observed": true,
-  "ambiguous_save_observed": false,
+  "ambiguous_save_observed": true,
   "visual_limitations": "Generated geometry, furnishings and camera view drift from the source. Preview is illustrative, not an exact SKU or placement rendering.",
-  "recovery_recording": "artifacts/video/showroom-recovery.mp4 is the earlier actual local recording while integrations were unavailable."
+  "recovery_recording": "artifacts/video/showroom-recovery.mp4 is the earlier actual local recording while integrations were unavailable.",
+  "original_capture_at": "2026-09-12T19:51:38.998Z",
+  "final_edit": "First100seconds of actual Orbis capture, then20seconds of actual approved Ambiguous save recorded later in the same room; no new Orbis stream.",
+  "approved_save_evidence": "approved-save.json",
+  "final_edit_at": "2026-09-12T20:35:50.580Z"
 }

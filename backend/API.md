@@ -16,6 +16,7 @@ Start from the repository root with `./scripts/start-backend.sh`. FastAPI binds 
 | GET `/api/ambiguous/documents/{id}` | — | Real selected document content |
 | POST `/api/rooms/{id}/export-preview` | — | `{approval_id,title,content,shopping_rows}`; no external write |
 | POST `/api/rooms/{id}/export` | `{approval_id,approved:true}` | Approved private Ambiguous doc containing brief and shopping list, receipt and verified readback |
+| POST `/api/rooms/{id}/export-reconcile` | `{approval_id,approved:true}` | Explicit recovery of an uncertain save only when complete real document and document-activity lists are empty; performs no external write |
 
 All prices are a **curated IKEA US catalog snapshot checked September 12, 2026**, not live inventory or a checkout quote. Product source URLs, dimensions, and checked dates are stored in `catalog.json`. Editorial style tags are SHOWROOM metadata. Merchandise totals exclude tax, shipping, bulbs, and rug underlay. Reference images are retailer imagery; IKEA Estonia/Turkey/Portugal references show the same named design where US media extraction was unavailable. Follow the US product source to verify the purchasable variant.
 
@@ -25,10 +26,12 @@ Export approval is bound to the reviewed room, accepted instruction history, and
 
 SDK acknowledgements are reported by the local browser; this audit is not cryptographically attested provider evidence. Actual video playback must be observed in the browser to claim a live stream.
 
+Provider failures preserve upstream HTTP status and sanitized error fields in the local approval receipt. Definitive input/access rejection can be retried after correcting its cause; network/server uncertainty remains blocked. The explicit reconciliation endpoint requires the same unchanged approval, an uncertain terminal request, no returned identifier, and two complete empty provider lists. Existing documents, pagination, missing fields, or read errors leave the write blocked. Successful reconciliation records its GET evidence and enables a separate retry of the same approved content; it never creates a document itself.
+
 Provider references used for implementation:
 
 - [Reactor Orbis Dynamic API](https://www.reactor.inc/models/visko-orbis-dynamic/api): scoped `POST /tokens`, model resource match and short-lived token.
-- [Ambiguous OpenAPI](https://app.ambiguous.ai/api/openapi.json): `POST /api/documents`, Markdown string content, private visibility, `GET /api/documents/{id}`.
+- [Ambiguous OpenAPI](https://app.ambiguous.ai/api/openapi.json): `POST /api/documents`, Markdown string content, `restricted` visibility (the provider's private document mode, documented by document visibility/revoke-link endpoints), `GET /api/documents/{id}`.
 - [Ambiguous recipes](https://www.ambiguous.ai/agents/recipes): inspectable `https://app.ambiguous.ai/docs/{id}` links.
 
 Run local contract tests with `.venv/bin/python -m pytest backend -q`. Mocked provider tests prove contract and failure handling only; they are not evidence of real provider access.

@@ -4,7 +4,9 @@
 
 SHOWROOM connects a room-design conversation to a reviewable brief and a calculated shopping list. Preferences, spending limits and “keep” constraints stay with the room while the user refines its direction.
 
-The Ambiguous integration is designed to read workspace context, present a concrete export preview and write only after approval. The current handoff writes one document containing the brief and shopping table; its returned identifier and link are retained when a save succeeds. A separate spreadsheet writer is not implemented. A preview or approval alone is never represented as a completed remote write. See the verification record for live read/write status.
+The Ambiguous integration is designed to read workspace context, present a concrete export preview and write only after approval. The current handoff writes one document containing the brief and shopping table; its returned identifier and link are retained when a save succeeds. A separate spreadsheet writer is not implemented. A preview or approval alone is never represented as a completed remote write. The participant approved the exact $219.97 brief; its remote document was saved and its title and authored content verified by read-back. [Open the saved document](https://app.ambiguous.ai/docs/4adbc629-1359-4b19-bb75-74e9f38d26a3) (workspace access required), or inspect the [save evidence](../../docs/evidence/approved-save.json).
+
+![Actual verified Ambiguous save](../../artifacts/screenshots/saved-dialog.png)
 
 ![Actual SHOWROOM workspace](../../artifacts/screenshots/desktop.png)
 

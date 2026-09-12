@@ -21,7 +21,7 @@ Positive checks:
 
 Known limits affecting acceptance:
 
-- Credentials were absent during the initial local smoke verification. Later actual Orbis frames and two visible changes, plus Qoder-generated tests and live Ambiguous reads, are recorded in the consolidated verification report; the prepared write awaits user approval. No fixture or static reference photograph is presented as generated output.
+- Credentials were absent during the initial local smoke verification. Later actual Orbis frames and two visible changes, plus Qoder-generated tests and the subsequently approved Ambiguous save with verified read-back, are recorded in the consolidated verification report. No fixture or static reference photograph is presented as generated output.
 - The SDK acknowledgement log is browser-reported, not cryptographic provider attestation. Local synthetic acknowledgement tests are contract tests only.
 - The recommendation catalog contains four curated products and category-level keep exclusion. It is not an inventory search engine or geometric fit solver.
 - Export serialization is in-process and the application is explicitly one local user/one backend process. Multi-worker deployment would require cross-process write coordination and authentication.
