@@ -60,7 +60,7 @@ The final MP4 retains the first 100 seconds of the actual Orbis recording and ap
 
 ## Fullscreen, Amazon discovery and voice follow-up
 
-The completed follow-up adds fullscreen direction entry, frame hold with actual Orbis pause/resume acknowledgments, Amazon discovery through Exa and OpenAI speech transcription. Real provider calls and browser controls were verified separately; see the [feature verification record](voice-and-player.md). The original deck and two-minute demo remain the historical sprint demonstration. The new screenshots show the added controls and real Amazon results.
+The completed follow-up adds fullscreen direction entry, frame hold with actual Orbis pause/resume acknowledgments, Amazon discovery through Exa and OpenAI speech transcription. Real provider calls and browser controls were verified separately; see the [feature verification record](voice-and-player.md). The two-minute demo remains the historical sprint demonstration. The deck was revised to the participant’s five-slide sequence with the deployed Render QR code. The new screenshots show the added controls and real Amazon results.
 
 ## Frame shopping and saved video
 
@@ -69,3 +69,9 @@ Click-to-search and automatic browser recording extend the existing journey. See
 ## Search latency and hosting preparation
 
 [Measured search caching](search-latency-live.json) reduced the repeated identical frame request from 14,829 ms to 45 ms in one actual OpenAI/Exa test. This is a warm-cache measurement, not a guarantee for new searches. The first request still waited for provider extraction. Search now requests four results, allows six-hour page reuse and caches successful results for fifteen minutes; frame descriptions have a ten-minute cache. Cache isolation, expiry, cancellation, concurrency and attribute ranking have dedicated tests. Hosted packaging and its private access gate are documented in the [Render guide](../deploy-render.md).
+
+## Hosted Render deployment and revised deck
+
+[The hosted studio](https://showroom-q4s4.onrender.com) is live with a password gate and private persistent Neo4j. [Hosted HTTP checks](render-http-verification.json) verify graph-based recommendations, Ambiguous reads, actual OpenAI/Exa visual search and a repeat request using both caches (198 ms end-to-end, 16.5 s cold). [Browser checks](render-browser-verification.json) verify desktop/mobile with no page errors or horizontal overflow. The hosted Orbis attempt returned an honest 429 capacity error for the account’s occupied single-session quota; no hosted frames are claimed. No new external documents were written.
+
+The deck now follows the requested sequence: hero + SHOWROOM only; problem / why; demo-video placeholder; Ambiguous / OpenAI / Exa / Neo4j / Qoder / VISKO architecture; deployed Render QR code. Qoder’s contribution is explicitly development/testing. The QR was decoded from the rendered final slide to verify its destination. The PDF has exactly five pages; the existing two-minute MP4 remains the historical demo.

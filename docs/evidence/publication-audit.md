@@ -70,3 +70,7 @@ The original deck and two-minute pitch recording remain historical sprint artifa
 ## Search latency and Render packaging — September 12, 2026
 
 The updated source digest is `8545a80dac3b7c42c78f0e597a2e329c62bb4b6b07293d529926b6055c883778` across 37 backend/frontend files. The backend suite passes 46 tests. Real visual search measured 14,829 ms cold and 45 ms for the identical warm request; this is a repeat-request cache result, not a guarantee for new searches. See [the live receipt](search-latency-live.json). Isolated production containers passed authentication, Neo4j connectivity, static WASM delivery and persistence after restart; see [the container receipt](render-local-verification.json). Hosted deployment is not yet claimed by this packaging check.
+
+## Hosted verification and five-slide revision
+
+Both Render services are live. The public [HTTP receipt](render-http-verification.json), [browser receipt](render-browser-verification.json), [deployment guide](../deploy-render.md), revised five-page deck and rendered QR preview are included in every package. The QR contains only the HTTPS studio address. Hosted live-video verification was blocked by the occupied Orbis quota; the error is disclosed. No integration source changed after the preceding digest. The deck now supersedes the earlier sprint deck; the two-minute MP4 remains unchanged.

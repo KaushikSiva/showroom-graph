@@ -1,5 +1,7 @@
 # SHOWROOM / Connected design memory
 
+**Hosted studio:** [showroom-q4s4.onrender.com](https://showroom-q4s4.onrender.com) · sign-in required. See the [Render deployment guide](../../docs/deploy-render.md).
+
 **Remember why a piece belongs in the room.**
 
 SHOWROOM models room constraints, styles, products and decisions as connected context. Neo4j relationships support inspectable recommendations, while the application retains the budget and existing furniture through successive instructions.

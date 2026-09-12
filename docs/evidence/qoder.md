@@ -1,6 +1,6 @@
 # Qoder engineering evidence
 
-Status: **actual Qoder implementation completed and independently verified**. Authenticated Qoder CLI **1.1.51** created `backend/test_qoder_journey.py` and exited successfully. Its five new tests pass; the complete backend suite passes 18 tests.
+Status: **actual Qoder implementation completed and independently verified**. Authenticated Qoder CLI **1.1.51** created `backend/test_qoder_journey.py` and exited successfully. Its five new tests pass; the complete backend suite now passes 46 tests (18 at the original Qoder verification).
 
 Create a Personal Access Token at [Qoder account integrations](https://qoder.com/account/integrations), then place it in the ignored root `.env` as `QODER_PERSONAL_ACCESS_TOKEN`. Do not paste the value into an issue, README, recording, or terminal transcript.
 

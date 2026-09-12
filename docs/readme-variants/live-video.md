@@ -1,5 +1,7 @@
 # SHOWROOM / Live rooms
 
+**Hosted studio:** [showroom-q4s4.onrender.com](https://showroom-q4s4.onrender.com) · sign-in required. See the [Render deployment guide](../../docs/deploy-render.md).
+
 **A room you can direct while you think.**
 
 Upload a living room, preserve what matters and use short instructions to direct a live Orbis session. SHOWROOM keeps the budget and product decisions beside the visual preview so the conversation can lead to a practical room plan.

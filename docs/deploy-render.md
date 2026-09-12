@@ -1,5 +1,9 @@
 # Deploy SHOWROOM on Render
 
+**Deployed:** [SHOWROOM studio](https://showroom-q4s4.onrender.com). Username: `showroom`. For this API deployment, the password is the private `RENDER_STUDIO_PASSWORD` value in the local ignored `.env` (also `SHOWROOM_ACCESS_PASSWORD` in the Render web service environment). Never place the password in the deck, QR code or repository.
+
+Both services are live. Hosted desktop/mobile, private Neo4j recommendations, Ambiguous reads, OpenAI item identification and Exa Amazon results passed. A repeated visual search measured 198 ms end-to-end versus 16.5 seconds cold. The hosted Orbis attempt reached Reactor but was rejected with HTTP 429 because the account already had its one allowed concurrent session; hosted frames were not verified. The UI displayed the capacity error. Earlier actual local Orbis streaming remains separately verified. See [HTTP evidence](evidence/render-http-verification.json) and [browser evidence](evidence/render-browser-verification.json).
+
 The production Docker image serves the React frontend, Python API and Reactor WASM runtime on one HTTPS origin. `PORT` controls the listening port. SQLite state and uploads use `/var/data/showroom`; a private Neo4j service uses its own `/data` disk. The hosted studio requires HTTP Basic sign-in (username `showroom`) because it can use paid APIs and read the connected Ambiguous workspace.
 
 The reviewed [Render Blueprint](../render.yaml) creates:

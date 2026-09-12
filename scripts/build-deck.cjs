@@ -3,8 +3,6 @@ const path = require('node:path');
 const fs = require('node:fs/promises');
 const root = path.resolve(__dirname, '..');
 (async () => {
-  const architecture = await fs.readFile(path.join(root,'docs/architecture.svg'),'utf8');
-  await fs.writeFile(path.join(root,'docs/deck/architecture-detail.svg'),architecture.replace('width="1440" height="800" viewBox="0 0 1440 800"','width="1440" height="570" viewBox="0 150 1440 570"'));
   const browser = await chromium.launch({channel:'chrome',headless:true});
   const page = await browser.newPage({viewport:{width:1280,height:720},deviceScaleFactor:1});
   await page.goto(`file://${path.join(root,'docs/deck/showroom-deck.html')}`);

@@ -1,5 +1,7 @@
 # SHOWROOM
 
+**Hosted studio:** [showroom-q4s4.onrender.com](https://showroom-q4s4.onrender.com) · sign-in required. See the [Render deployment guide](docs/deploy-render.md).
+
 **Design the room. Keep the decisions.**
 
 SHOWROOM brings a room photo, a spending limit, live visual direction and a sourced shopping list into one workspace. The intended journey is: upload a room → set preferences and what stays → start Orbis → steer twice → inspect products → approve an Ambiguous design brief and shopping-list handoff.
@@ -116,7 +118,7 @@ node scripts/build-deck.cjs
 python3 scripts/build-publication.py
 ```
 
-The deck has exactly five sections: problem, live experience, product demonstration, technical differentiation, and customer/business opportunity. Its customer and pricing proposals are hypotheses, not claimed traction.
+The deck has exactly five slides: hero photograph with SHOWROOM title only; problem / why; demo-video placeholder; architecture focused on Ambiguous, OpenAI, Exa, Neo4j, Qoder and VISKO / Orbis; and a QR code for the Render studio. The demo placeholder links to the existing two-minute MP4 until a YouTube URL is supplied. Edit `docs/deck/showroom-deck.html` to change the copy or video link. To change the QR destination, install `tooling/deck-requirements.txt`, run `python scripts/set-deck-url.py https://your-studio.onrender.com`, then rebuild the deck.
 
 ## One codebase, three presentations
 

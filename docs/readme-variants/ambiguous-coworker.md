@@ -1,5 +1,7 @@
 # SHOWROOM / The design coworker
 
+**Hosted studio:** [showroom-q4s4.onrender.com](https://showroom-q4s4.onrender.com) · sign-in required. See the [Render deployment guide](../../docs/deploy-render.md).
+
 **Turn a visual decision into work someone can use.**
 
 SHOWROOM connects a room-design conversation to a reviewable brief and a calculated shopping list. Preferences, spending limits and “keep” constraints stay with the room while the user refines its direction.
