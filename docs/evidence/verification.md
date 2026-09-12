@@ -1,0 +1,53 @@
+# SHOWROOM verification
+
+Independent verification on September 12, 2026. This report separates real local execution from provider contract tests. No external document write or live generation was performed by the verification agent. Subsequent authenticated live execution is recorded below: actual Orbis frames and two visibly effective directions were verified; Ambiguous reads are live and the prepared write awaits user approval.
+
+| Acceptance item | Result | Evidence |
+| --- | --- | --- |
+| Python API runs locally on 8190 | Passed | HTTP `/api/health` returned 200; detached local Uvicorn process |
+| Decoded image upload and retrieval | Passed | Real multipart sample JPEG upload, returned image URL fetched successfully; invalid file returns 415 |
+| Budget and keep constraints persist | Passed | HTTP/Python checks; recommendations exclude kept sofa; changed constraints invalidate shopping selection |
+| Neo4j relationships affect recommendations | Passed, real Neo4j | Same $150 budget/kept sofa: `natural` returns LOHALS rug ($129.99); `minimal` returns LACK table + RANARP lamp ($89.98). Both report `connected`; an independent Bolt query retrieved the actual Room–Style–Product path |
+| Cents-based shopping total | Passed | Sum of source snapshot prices equals saved total and fits budget |
+| Export requires exact approval | Passed locally | Missing approval returns 403; changed room returns 409; approval for a different room returns 404 |
+| Concurrent/retried save avoids duplicate creation | Passed in mocked contract tests | Three simultaneous approved requests produce one mocked POST and one GET; returned identifier is persisted before readback; uncertain create outcomes block blind retry |
+| Upload starts real Orbis video | Passed, actual provider | Authorized Reactor session produced 2560 × 1440 decoded WebRTC frames from the uploaded room. See [live capture](live-capture.json), the MP4 and screenshots |
+| Two subsequent live directions visibly steer video | Passed, actual visible changes | Deep olive wall followed by cobalt rug and amber lighting; both real SDK prompt acknowledgments, independently viewed screenshots and advancing decoded frames |
+| Real Ambiguous read/write and retrievable link | Read passed; write awaiting user approval | Official CLI provisioned access; actual documents read returned HTTP 200. Exact final brief is prepared. No remote write is claimed yet |
+| Desktop/mobile UI | Passed, real browser at 1280×900 and 391×844 | Actual upload; budget400; kept lamp/sofa excluded; real graph returns rug/table159.98; review opens after retrieval and reload; missing-key errors are honest; no horizontal overflow or uncaught browser errors; mobile review reachable |
+| Production SDK runtime delivery | Passed without provider access | Production build passed; preview5191 serves SDK JavaScript200 with `text/javascript`, WASM200 with `application/wasm` (651458 bytes). Browser module initialization succeeded and exports `ReactorClient`; zero provider calls |
+| Qoder implementation/testing contribution | Passed, actual authenticated CLI task | [Qoder evidence](qoder.md): new file, sanitized successful transcript, five independently passing tests |
+| PDF/video/publication artifacts | Passed, final artifact checks | Five-page PDF; exact 120-second H.264 / yuv420p MP4, full decode; source and Markdown-link checks in [artifact verification](artifact-verification.json) and [publication audit](publication-audit.md) |
+
+With the backend, frontend, and Neo4j started, install browser-check dependencies from the repository root:
+
+```sh
+npm ci --prefix tooling
+```
+
+Both browser scripts use Google Chrome at its default macOS application path, or an executable selected with `export CHROME_PATH="/absolute/path/to/chrome"`. If neither is available, install Playwright Chromium:
+
+```sh
+node tooling/node_modules/playwright/cli.js install chromium
+```
+
+Then run:
+
+```sh
+.venv/bin/python -m pytest backend -q
+node scripts/smoke-browser.cjs
+cd frontend && npm run build && cd ..
+node scripts/verify-sdk-runtime.cjs
+```
+
+The backend suite currently passes **18 tests**, including five authored by authenticated Qoder CLI 1.1.51. The browser smoke uses actual HTTP/application behavior and creates a local test room. It never clicks external approval; an explicit network route also blocks external-export API calls. If keys are configured, missing-credential tests are skipped rather than starting a paid session. It requires Neo4j connectivity.
+
+Detailed local graph/HTTP results: [http-verification.json](http-verification.json). Browser results: [browser-verification.json](browser-verification.json), with desktop, mobile and approval-review screenshots. Production SDK initialization: [wasm-verification.json](wasm-verification.json). These checks demonstrate local SDK readiness, not live provider acceptance or generated video.
+
+All four catalog prices and dimensions were independently checked against primary IKEA US product pages on September 12, 2026: [LOHALS $129.99, 63 × 91 × 0.5 inches](https://www.ikea.com/us/en/p/lohals-rug-flatwoven-natural-50277393/), [RANARP $59.99, 17-inch height, 7-inch shade, 59-inch cord](https://www.ikea.com/us/en/p/ranarp-work-lamp-off-white-50231319/), [LACK $29.99, 35⅜ × 21⅝ × 17¾ inches](https://www.ikea.com/us/en/p/lack-coffee-table-white-90449905/), and [GLOSTAD $169, 47⅝-inch width, 30¾-inch depth, 26¾-inch backrest](https://www.ikea.com/us/en/p/glostad-loveseat-knisa-dark-gray-70489011/). These are sourced snapshots, not live stock, checkout totals, or measured placement guarantees.
+
+## Final live-media evidence
+
+The final two-minute recording captures the same existing authorized Orbis session, with no second stream or synthetic video frames. Decoded frames advanced from 4,022 to 6,166 while 1,175 actual browser screen frames were recorded over two minutes. The two final directives retained the $900 budget and existing-sofa / windows-and-layout constraints in application state and model prompts. All reviewers observed the requested olive wall and cobalt rug.
+
+**Visual limitation:** Orbis changes room geometry, furniture details and camera position despite preservation requests. The preview cannot establish exact furniture placement or SKU fidelity. Product references and dimensions remain the basis for purchase decisions. The separately labeled recovery recording shows the earlier missing-credential UI and is not live-provider evidence.

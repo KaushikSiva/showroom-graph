@@ -1,0 +1,27 @@
+{
+  "checked_at": "2026-09-12T19:50:49.975Z",
+  "base": "http://127.0.0.1:5190",
+  "roomId": "f513b7d8-c84d-4fda-84c3-3a3971b1adfb",
+  "viewportDesktop": "1280x900",
+  "viewportMobile": "391x844",
+  "desktopOverflow": false,
+  "mobileOverflow": false,
+  "products": [
+    "LOHALS flatwoven rug",
+    "LACK coffee table"
+  ],
+  "total": 159.98,
+  "graph": "connected",
+  "checks": [
+    "Actual sample JPEG upload decoded and persisted",
+    "Budget/keep constraints and cents-based total from actual Neo4j recommendations",
+    "Exact design/shopping review opens after retrieval; canceled without approval",
+    "Reload preserves budget, selected products and reviewability",
+    "Reactor failure test skipped: credential configured; no paid session started by smoke test",
+    "Missing Ambiguous credential displays recoverable workspace error",
+    "Desktop1280 and mobile391: no horizontal overflow, accessible save action, no uncaught browser errors"
+  ],
+  "pageErrors": [],
+  "externalWrites": 0,
+  "liveStreamVerified": false
+}

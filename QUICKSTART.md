@@ -1,0 +1,103 @@
+# SHOWROOM
+
+**Design the room. Keep the decisions.**
+
+SHOWROOM brings a room photo, a spending limit, live visual direction and a sourced shopping list into one workspace. The intended journey is: upload a room → set preferences and what stays → start Orbis → steer twice → inspect products → approve an Ambiguous design brief and shopping-list handoff.
+
+**Verified:** real Orbis frames and two visibly different directions; live Neo4j recommendations; 18 backend tests, including five written by Qoder. Ambiguous workspace reads succeed; the exact export is prepared for user approval.
+
+![Actual live SHOWROOM workspace](artifacts/screenshots/live-change-2-final.png)
+
+Generated video is an illustrative preview. Source URLs, reference images, dimensions and quoted prices support purchasing decisions; the application does not infer that a rendered object is an exact purchasable SKU. Prices are catalog snapshots and exclude tax and shipping unless indicated.
+
+## Run locally
+
+Requires Python 3.11+, Node 20.19+ or 22.12+ (tested with 24.18), and Docker Desktop for the local Neo4j database. Default ports: frontend **5190**, backend **8190**, Neo4j **7474 / 7687**.
+
+```bash
+test -f .env || cp .env.example .env
+# Add your authorized integration credentials to .env.
+docker compose up -d
+bash scripts/start-backend.sh
+```
+
+In another terminal:
+
+```bash
+bash scripts/start-frontend.sh
+```
+
+Open [SHOWROOM](http://localhost:5190). Check the backend at [health](http://localhost:8190/api/health) and [interactive API documentation](http://localhost:8190/docs).
+
+The frontend displays actual integration availability. A missing credential, model capacity error or unsuccessful save is shown explicitly. An unavailable integration does not become a simulated successful operation.
+
+## Integration access
+
+All service credentials belong in the root `.env`, which is ignored by Git. Use `.env.example` for the precise variable names. Never put a service key in a `VITE_*` variable.
+
+- **Reactor / Orbis:** authorized Reactor API key and access to the Orbis model. The backend issues scoped access for the browser streaming SDK. A real browser session and two visible direction changes are recorded in the verification evidence.
+- **Neo4j:** use the local Docker instance or configure an accessible server. The graph stores connected room and product context. UI and health responses distinguish Neo4j from any local fallback.
+- **Ambiguous:** authorized workspace access for reads and approved document writes containing the design brief and shopping table. A successful save must return inspectable identifiers/links.
+- **Qoder:** optional developer tooling, not a browser dependency. Create a token at [Qoder integrations](https://qoder.com/account/integrations). Qoder authored five independently passing journey tests; see [engineering evidence](docs/evidence/qoder.md).
+
+## What is delivered
+
+| Artifact | Location |
+|---|---|
+| Five-page pitch deck | [PDF](artifacts/showroom-deck.pdf), [editable HTML](docs/deck/showroom-deck.html) |
+| Two-minute demonstration | [MP4](artifacts/video/showroom-demo.mp4), [captions](artifacts/video/showroom-demo.srt), [poster](artifacts/video/poster.jpg) |
+| Application screenshots | [Desktop](artifacts/screenshots/desktop.png), [mobile](artifacts/screenshots/mobile.png), [shopping](artifacts/screenshots/shopping.png) |
+| Architecture | [Editable SVG](docs/architecture.svg) |
+| Verification and limitations | [Evidence record](docs/evidence/verification.md) |
+| Event and disclosure record | [Eligibility](docs/evidence/event-eligibility.md) |
+| Three publication packages | [Publication index](docs/publication.md) |
+
+![SHOWROOM architecture](docs/architecture.svg)
+
+## Verify the application
+
+With all local services started, install the browser-check dependencies from the repository root:
+
+```bash
+npm ci --prefix tooling
+```
+
+The browser checks use Google Chrome at its default macOS application path, or an executable selected with `export CHROME_PATH="/absolute/path/to/chrome"`. If neither is available, install Playwright Chromium:
+
+```bash
+node tooling/node_modules/playwright/cli.js install chromium
+```
+
+Then run:
+
+```bash
+.venv/bin/python -m pytest backend -q
+node scripts/smoke-browser.cjs
+```
+
+The browser smoke uses the actual application and local Neo4j. It does not perform external writes.
+
+## Reproduce artifacts
+
+The main MP4 contains an actual Orbis session. [Recovery footage](artifacts/video/showroom-recovery.mp4) is the separately labeled earlier local recording while credentials were unavailable; it is not live-provider evidence. Generated geometry, camera position and furniture can drift from the input photo, so the preview is illustrative.
+
+The capture tools require Chrome plus `ffmpeg`/`ffprobe` on your PATH. They record actual browser behavior against the local application. Run captures only with the sample room or with permission to include the uploaded image in published material.
+
+```bash
+npm ci --prefix tooling
+node scripts/capture-demo.cjs
+node scripts/build-deck.cjs
+python3 scripts/build-publication.py
+```
+
+The deck has exactly five sections: problem, live experience, product demonstration, technical differentiation, and customer/business opportunity. Its customer and pricing proposals are hypotheses, not claimed traction.
+
+## One codebase, three presentations
+
+The live-video, Ambiguous-coworker and Qoder/Neo4j packages are README variants of this **same SHOWROOM monorepo**. Each package includes its source digest, proposed repository description and topics in `publication.json`. None is represented as a separate independent build. Cross-event eligibility was explicitly confirmed by the participant on September 12, 2026; see the [source and confirmation record](docs/evidence/event-eligibility.md).
+
+This project was created as a fresh SHOWROOM application during the sprint. It uses public libraries and SDKs. The sample room’s provenance is recorded in [frontend/ASSETS.md](frontend/ASSETS.md). No prize, adoption target, DGX hardware execution or successful third-party integration is claimed without evidence.
+
+## Public repository presentations
+
+[Canonical live video](https://github.com/KaushikSiva/showroom), [Ambiguous coworker](https://github.com/KaushikSiva/showroom-coworker), and [Qoder / Neo4j](https://github.com/KaushikSiva/showroom-graph) present this same codebase with focused READMEs. See [publication status and source disclosure](docs/publication.md).

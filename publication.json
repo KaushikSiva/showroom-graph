@@ -1,0 +1,53 @@
+{
+  "suggested_name": "showroom-graph",
+  "description": "Explainable furniture recommendations with Neo4j room context, persistent design constraints, and disclosed engineering evidence.",
+  "topics": [
+    "neo4j",
+    "knowledge-graph",
+    "recommendation-engine",
+    "interior-design",
+    "fastapi",
+    "react",
+    "qoder"
+  ],
+  "presentation_focus": "Qoder / Neo4j: connected design memory and engineering evidence",
+  "disclosure": "One SHOWROOM codebase, presented with a graph-memory-focused README. Qoder usage status is disclosed in docs/evidence/qoder.md.",
+  "repository_url": "https://github.com/KaushikSiva/showroom-graph",
+  "canonical_repository_url": "https://github.com/KaushikSiva/showroom",
+  "related_repositories": {
+    "live-video": "https://github.com/KaushikSiva/showroom",
+    "ambiguous-coworker": "https://github.com/KaushikSiva/showroom-coworker",
+    "qoder-neo4j": "https://github.com/KaushikSiva/showroom-graph"
+  },
+  "publication_status": "prepared for approved public GitHub destination",
+  "canonical_project": "SHOWROOM",
+  "same_codebase": true,
+  "source_sha256": "67a90ac54ff9415cb7e82f58012e8564e7133422cfcbf2f8d83bee19451bd41c",
+  "source_files": [
+    "backend/API.md",
+    "backend/__init__.py",
+    "backend/catalog.json",
+    "backend/main.py",
+    "backend/requirements.txt",
+    "backend/test_main.py",
+    "backend/test_qoder_journey.py",
+    "backend/test_verification.py",
+    "backend/verification.json",
+    "frontend/.gitignore",
+    "frontend/ASSETS.md",
+    "frontend/index.html",
+    "frontend/package-lock.json",
+    "frontend/package.json",
+    "frontend/public/favicon.svg",
+    "frontend/public/images/sample-room.jpg",
+    "frontend/src/App.tsx",
+    "frontend/src/api.ts",
+    "frontend/src/main.tsx",
+    "frontend/src/stream.ts",
+    "frontend/src/style.css",
+    "frontend/src/vite-env.d.ts",
+    "frontend/tsconfig.json",
+    "frontend/vite.config.ts"
+  ],
+  "canonical_local_commit": "ce4203f17679f8190d66679ab3bfe4751a39c9e7"
+}
