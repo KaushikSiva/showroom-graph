@@ -4,9 +4,17 @@
 
 SHOWROOM models room constraints, styles, products and decisions as connected context. Neo4j relationships support inspectable recommendations, while the application retains the budget and existing furniture through successive instructions.
 
-This presentation focuses on connected memory and engineering execution. Authenticated Qoder CLI 1.1.51 authored five meaningful journey tests, all independently passing. The evidence document contains the exact task, sanitized successful CLI result, file diff and execution record. The complete backend suite passes 23 tests. The graph’s live verification status is recorded separately from any local fallback.
+This presentation focuses on connected memory and engineering execution. Authenticated Qoder CLI 1.1.51 authored five meaningful journey tests, all independently passing. The evidence document contains the exact task, sanitized successful CLI result, file diff and execution record. The complete backend suite passes 33 tests. The graph’s live verification status is recorded separately from any local fallback.
 
 ![Actual SHOWROOM workspace](../../artifacts/screenshots/desktop.png)
+
+## Direct and discover by voice
+
+Maximize the room and keep typing or dictating directions. Pause holds the visible frame and pauses Orbis generation; Resume continues it. Furniture search now retrieves real Amazon product pages through Exa, with OpenAI speech-to-text beside both inputs. Review the transcript before sending. Missing source prices display “Check price” and are excluded from the priced subtotal. [Actual provider and browser evidence](../../docs/evidence/voice-and-player.md).
+
+![Fullscreen room with paused preview and direction controls](../../artifacts/screenshots/fullscreen-paused.png)
+
+![Real Amazon search from an OpenAI-transcribed test recording](../../artifacts/screenshots/amazon-voice-search.png)
 
 ## Run and inspect
 

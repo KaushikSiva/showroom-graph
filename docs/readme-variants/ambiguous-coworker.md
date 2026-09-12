@@ -10,6 +10,14 @@ The Ambiguous integration is designed to read workspace context, present a concr
 
 ![Actual SHOWROOM workspace](../../artifacts/screenshots/desktop.png)
 
+## Direct and discover by voice
+
+Maximize the room and keep typing or dictating directions. Pause holds the visible frame and pauses Orbis generation; Resume continues it. Furniture search now retrieves real Amazon product pages through Exa, with OpenAI speech-to-text beside both inputs. Review the transcript before sending. Missing source prices display “Check price” and are excluded from the priced subtotal. [Actual provider and browser evidence](../../docs/evidence/voice-and-player.md).
+
+![Fullscreen room with paused preview and direction controls](../../artifacts/screenshots/fullscreen-paused.png)
+
+![Real Amazon search from an OpenAI-transcribed test recording](../../artifacts/screenshots/amazon-voice-search.png)
+
 ## Run and inspect
 
 See [QUICKSTART](../../README.md) for Python/FastAPI, React and local Neo4j startup. Frontend: **http://localhost:5190**. Backend: **http://localhost:8190**. Credentials remain server-side in ignored `.env`.

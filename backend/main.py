@@ -21,6 +21,7 @@ from fastapi.staticfiles import StaticFiles
 from neo4j import GraphDatabase
 from PIL import Image, ImageOps, UnidentifiedImageError
 from pydantic import BaseModel, Field
+from backend.discovery import search_amazon, transcribe_audio
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = Path(os.environ.get("SHOWROOM_DATA_DIR", ROOT / "backend/data"))
@@ -106,33 +107,36 @@ def graph_driver():
     return GraphDatabase.driver(setting("NEO4J_URI", "bolt://localhost:7687"), auth=(setting("NEO4J_USER", "neo4j"), setting("NEO4J_PASSWORD", "showroom-local-dev")), connection_timeout=2, connection_acquisition_timeout=3, max_transaction_retry_time=2)
 
 
-def rank_products(room):
+def rank_products(room, candidates=None):
+    candidates = CATALOG if candidates is None else candidates
     tags, excluded = tags_for(room), kept_categories(room)
     try:
         with graph_driver() as driver, driver.session() as session:
             # Product tags are editorial catalog metadata, explicitly distinct from retailer facts.
-            for p in CATALOG:
+            for p in candidates:
                 session.run("MERGE (p:Product {id:$id}) SET p.name=$name,p.price=$price,p.category=$category WITH p UNWIND $tags AS tag MERGE (t:Style {name:tag}) MERGE (p)-[:HAS_STYLE]->(t)", **{k:p[k] for k in ("id","name","price","category","tags")}).consume()
             session.run("MERGE (r:Room {id:$id}) SET r.budget=$budget,r.keep=$keep,r.preferences=$preferences WITH r OPTIONAL MATCH (r)-[old:PREFERS]->() DELETE old", id=room["id"], budget=room["budget"], keep=room["keep"], preferences=room["preferences"]).consume()
             session.run("MATCH (r:Room {id:$id}) UNWIND $tags AS tag MERGE (t:Style {name:tag}) MERGE (r)-[:PREFERS]->(t)", id=room["id"], tags=tags).consume()
-            rows = list(session.run("MATCH (r:Room {id:$id}), (p:Product) WHERE p.price <= r.budget AND NOT p.category IN $excluded OPTIONAL MATCH (r)-[:PREFERS]->(t:Style)<-[:HAS_STYLE]-(p) RETURN p.id AS id, p.price AS price, count(t) AS score, collect(t.name) AS matches ORDER BY score DESC, price ASC, id ASC", id=room["id"], excluded=excluded))
+            rows = list(session.run("MATCH (r:Room {id:$id}), (p:Product) WHERE p.id IN $ids AND (p.price IS NULL OR p.price <= r.budget) AND NOT p.category IN $excluded OPTIONAL MATCH (r)-[:PREFERS]->(t:Style)<-[:HAS_STYLE]-(p) RETURN p.id AS id, p.price AS price, count(t) AS score, collect(t.name) AS matches ORDER BY p.price IS NULL, score DESC, price ASC, id ASC", id=room["id"], excluded=excluded, ids=[p["id"] for p in candidates]))
             ranked = [(dict(row)["id"], dict(row)["score"], dict(row)["matches"]) for row in rows]
         status = "connected"
         explanation = "Neo4j ranks Product → HAS_STYLE → Style ← PREFERS ← Room paths, then respects the remaining budget and keep constraints."
     except Exception:
-        ranked = [(p["id"], len(set(p["tags"]) & set(tags)), sorted(set(p["tags"]) & set(tags))) for p in CATALOG if p["category"] not in excluded and p["price"] <= room["budget"]]
-        ranked.sort(key=lambda item: (-item[1], next(p["price"] for p in CATALOG if p["id"] == item[0]), item[0]))
+        ranked = [(p["id"], len(set(p["tags"]) & set(tags)), sorted(set(p["tags"]) & set(tags))) for p in candidates if p["category"] not in excluded and (p["price"] is None or p["price"] <= room["budget"])]
+        ranked.sort(key=lambda item: (-item[1], next(p["price"] if p["price"] is not None else float("inf") for p in candidates if p["id"] == item[0]), item[0]))
         status = "fallback"
-        explanation = "Neo4j is unavailable. Recommendations currently use the local catalog's tag ranking; no live graph query is claimed."
+        explanation = "Neo4j is unavailable. Recommendations currently use local tag ranking over the retrieved candidates; no live graph query is claimed."
     selected, remaining, categories = [], round(room["budget"] * 100), set()
     for product_id, score, matches in ranked:
-        p = dict(next(p for p in CATALOG if p["id"] == product_id))
-        cents = round(p["price"] * 100)
-        if cents > remaining or p["category"] in categories: continue
+        p = dict(next(p for p in candidates if p["id"] == product_id))
+        cents = round(p["price"] * 100) if p["price"] is not None else 0
+        if cents > remaining or (p.get("source") != "exa_amazon" and p["category"] in categories): continue
         remaining -= cents
         categories.add(p["category"])
         p.update(score=score, matched_styles=matches, selected=True, reason=(f"Matches {', '.join(matches)} through {'Neo4j style relationships' if status == 'connected' else 'local catalog tags'}." if matches else "Fits the available budget and does not replace a kept item."))
+        if p["price"] is None: p["reason"] = "Price unavailable; check the Amazon listing before budgeting. " + p["reason"].replace("Fits the available budget and does not replace a kept item.", "Does not replace a kept item.")
         selected.append(p)
+        if len(selected) >= 6: break
     return selected, {"status": status, "explanation": explanation, "matched_tags": tags, "excluded_categories": excluded, "relationship_count": sum(p["score"] for p in selected)}
 
 
@@ -163,6 +167,11 @@ class TokenInput(BaseModel):
     room_id: str
 
 
+class RecommendationInput(BaseModel):
+    source: Literal["catalog", "amazon"] = "catalog"
+    query: str = Field(default="", max_length=1600)
+
+
 class ExportInput(BaseModel):
     approval_id: str
     approved: bool = False
@@ -182,6 +191,8 @@ def health():
     return {"status":"ok", "integrations":{
         "reactor":{"configured": bool(setting("REACTOR_API_KEY")), "status": PROVIDER_STATUS["reactor"] if setting("REACTOR_API_KEY") else "missing_key"},
         "ambiguous":{"configured": bool(setting("AMBIGUOUS_API_KEY")), "status": PROVIDER_STATUS["ambiguous"] if setting("AMBIGUOUS_API_KEY") else "missing_key"},
+        "exa":{"configured": bool(setting("EXA_API_KEY")), "status":"configured" if setting("EXA_API_KEY") else "missing_key"},
+        "openai":{"configured": bool(setting("OPENAI_API_KEY")), "status":"configured" if setting("OPENAI_API_KEY") else "missing_key"},
         "neo4j":{"configured": True, "status": graph_status}}, "catalog":{"count":len(CATALOG),"price_checked_at":"2026-09-12","mode":"curated merchant snapshot"}}
 
 
@@ -206,6 +217,9 @@ def patch_room(room_id: str, body: RoomPatch):
         room.update(changes)
         # A changed budget or keep constraint invalidates the old shopping selection.
         room["products"], room["total"] = [], 0
+        room["unpriced_count"] = 0
+        room.pop("product_source", None)
+        room.pop("search", None)
         room["graph"] = {"status":"not_queried","explanation":"Room constraints changed. Retrieve furniture again."}
         return save_room(room)
 
@@ -251,12 +265,36 @@ def acknowledge(room_id: str, directive_id: str, body: AckInput):
         return save_room(room)
 
 
+@app.post("/api/transcriptions")
+async def transcription(file: UploadFile = File(...)):
+    content = await file.read(12 * 1024 * 1024 + 1)
+    return await transcribe_audio(setting("OPENAI_API_KEY"), content, file.content_type or "")
+
+
 @app.post("/api/rooms/{room_id}/recommendations")
-def recommend(room_id: str):
+async def recommend(room_id: str, body: RecommendationInput = RecommendationInput()):
+    room = get_room(room_id)
+    before = fingerprint(room)
+    candidates = None
+    if body.source == "amazon":
+        candidates, query = await search_amazon(setting("EXA_API_KEY"), body.query, room)
+        excluded = kept_categories(room)
+        candidates = [p for p in candidates if p['category'] not in excluded and not any(alias in p['name'].lower() for category in excluded for alias in {'sofa':['sofa','couch','loveseat'],'table':['table'],'rug':['rug','carpet'],'lighting':['lamp','lighting']}.get(category,[]))]
+        for p in candidates:
+            p['tags'] = [tag for tag in tags_for(room) if tag in p['name'].lower()]
+        if not candidates: raise HTTPException(404, 'Exa returned no usable Amazon product listings for this request. Try a different search; your shopping list is unchanged.')
     with LOCK:
-        room = get_room(room_id)
-        room["products"], room["graph"] = rank_products(room)
-        room["total"] = sum(round(p["price"]*100) for p in room["products"]) / 100
+        current = get_room(room_id)
+        if fingerprint(current) != before: raise HTTPException(409, 'Your brief changed during search. Search again with the updated brief.')
+        room = current  # Preserve concurrent export receipts outside the brief fingerprint.
+        room["products"], room["graph"] = rank_products(room, candidates)
+        if not room["products"]: raise HTTPException(404, "No retrieved items fit the current budget and keep constraints. Try a different search.")
+        room["total"] = sum(round(p["price"] * 100) for p in room["products"] if p["price"] is not None) / 100
+        room["unpriced_count"] = sum(p["price"] is None for p in room["products"])
+        room["product_source"] = body.source
+        if body.source == "amazon":
+            room["search"] = {"query":query,"provider":"exa","domain":"amazon.com","retrieved_at":now()}
+            room["graph"]["explanation"] += " Amazon listings were retrieved through Exa. Only source-quoted prices enter the subtotal; missing prices require checking Amazon."
         return save_room(room)
 
 
@@ -342,10 +380,11 @@ def export_content(room):
     lines += ["", "## Shopping list", "", "| Product | Price (USD) | Dimensions | Source |", "| --- | ---: | --- | --- |"]
     rows = [["Product","Price (USD)","Dimensions","Retailer source"]]
     for p in room["products"]:
-        lines.append(f"| {p['name']} | {p['price']:.2f} | {p['dimensions']} | {p['source_url']} |")
-        rows.append([p["name"],p["price"],p["dimensions"],p["source_url"]])
-    rows.append(["Total",room["total"],"Excludes tax, shipping and accessories",""])
-    lines += ["",f"Merchandise total: USD {room['total']:.2f}. Tax, shipping, bulbs and rug underlay are not included.","", "Prices are a curated IKEA US snapshot checked 2026-09-12. Confirm current prices, availability and dimensions before purchase.", "", "Generated video is an illustrative preview, not a dimensionally accurate rendering or proof that a depicted product exists.", "", room["graph"]["explanation"]]
+        price_text = f"{p['price']:.2f}" if p["price"] is not None else "Not quoted"
+        lines.append(f"| {p['name']} | {price_text} | {p['dimensions']} | {p['source_url']} |")
+        rows.append([p["name"],p["price"] if p["price"] is not None else "Not quoted",p["dimensions"],p["source_url"]])
+    rows.append(["Priced subtotal" if room.get("unpriced_count") else "Total",room["total"],"Excludes unquoted items, tax, shipping and accessories",""])
+    lines += ["",f"{'Priced subtotal' if room.get('unpriced_count') else 'Merchandise total'}: USD {room['total']:.2f}. Tax, shipping, bulbs and rug underlay are not included.","", (f"Amazon listings retrieved through Exa. {room.get('unpriced_count',0)} items have no quoted price and are excluded from the subtotal. Confirm current price, availability and dimensions on each Amazon listing." if room.get("product_source")=="amazon" else "Prices are a curated IKEA US snapshot checked 2026-09-12. Confirm current prices, availability and dimensions before purchase."), "", "Generated video is an illustrative preview, not a dimensionally accurate rendering or proof that a depicted product exists.", "", room["graph"]["explanation"]]
     return "\n".join(lines), rows
 
 

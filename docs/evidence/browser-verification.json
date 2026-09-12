@@ -1,7 +1,7 @@
 {
-  "checked_at": "2026-09-12T19:50:49.975Z",
+  "checked_at": "2026-09-12T21:16:29.253Z",
   "base": "http://127.0.0.1:5190",
-  "roomId": "f513b7d8-c84d-4fda-84c3-3a3971b1adfb",
+  "roomId": "b373249b-9cd8-4f63-97f2-734f8153c6d3",
   "viewportDesktop": "1280x900",
   "viewportMobile": "391x844",
   "desktopOverflow": false,
@@ -18,7 +18,7 @@
     "Exact design/shopping review opens after retrieval; canceled without approval",
     "Reload preserves budget, selected products and reviewability",
     "Reactor failure test skipped: credential configured; no paid session started by smoke test",
-    "Missing Ambiguous credential displays recoverable workspace error",
+    "Ambiguous failure test skipped: credential configured; no external read/write required",
     "Desktop1280 and mobile391: no horizontal overflow, accessible save action, no uncaught browser errors"
   ],
   "pageErrors": [],

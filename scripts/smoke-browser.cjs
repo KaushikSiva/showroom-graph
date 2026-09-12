@@ -25,6 +25,7 @@ const chrome='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
   await page.locator('#budget').fill('400');
   await page.getByLabel('Add a keep constraint',{exact:true}).fill('existing lamp');
   await page.getByRole('button',{name:'Add keep constraint',exact:true}).click();
+  await page.getByRole('combobox',{name:'Product source'}).selectOption('catalog');
   await page.getByRole('button',{name:'Find the pieces'}).click();
   await page.locator('.product-row').first().waitFor();
   const roomId=await page.evaluate(()=>localStorage.getItem('showroom.room'));

@@ -4,11 +4,11 @@
 
 SHOWROOM brings a room photo, a spending limit, live visual direction and a sourced shopping list into one workspace. The intended journey is: upload a room → set preferences and what stays → start Orbis → steer twice → inspect products → approve an Ambiguous design brief and shopping-list handoff.
 
-**Verified:** real Orbis frames and two visibly different directions; live Neo4j recommendations; 23 backend tests, including five written by Qoder. An approved Ambiguous document containing the exact brief and $219.97 shopping list was saved and read back successfully. [Inspect the saved document](https://app.ambiguous.ai/docs/4adbc629-1359-4b19-bb75-74e9f38d26a3) (workspace access required); see [save evidence](docs/evidence/approved-save.json).
+**Verified:** real Orbis frames and two visibly different directions; live Neo4j recommendations; 33 backend tests, including five written by Qoder. An approved Ambiguous document containing the exact brief and $219.97 shopping list was saved and read back successfully. [Inspect the saved document](https://app.ambiguous.ai/docs/4adbc629-1359-4b19-bb75-74e9f38d26a3) (workspace access required); see [save evidence](docs/evidence/approved-save.json).
 
 ![Actual live SHOWROOM workspace](artifacts/screenshots/live-change-2-final.png)
 
-Generated video is an illustrative preview. Source URLs, reference images, dimensions and quoted prices support purchasing decisions; the application does not infer that a rendered object is an exact purchasable SKU. Prices are catalog snapshots and exclude tax and shipping unless indicated.
+Generated video is an illustrative preview. Source URLs, reference images, dimensions and quoted prices support purchasing decisions; the application does not infer that a rendered object is an exact purchasable SKU. Prices are source quotes or catalog snapshots and exclude tax and shipping unless indicated.
 
 ## Run locally
 
@@ -31,11 +31,23 @@ Open [SHOWROOM](http://localhost:5190). Check the backend at [health](http://loc
 
 The frontend displays actual integration availability. A missing credential, model capacity error or unsuccessful save is shown explicitly. An unavailable integration does not become a simulated successful operation.
 
+## Direct, pause, and search
+
+Use the maximize control to keep the room, direction box, microphone and Pause/Resume controls together. Pause holds the visible frame immediately and asks Orbis to pause generation at the next chunk boundary. You can type or dictate another direction while paused, then resume generation from the held preview. Exit fullscreen or press Escape without losing your draft. [Actual live pause/resume evidence](docs/evidence/player-live-verification.json).
+
+Furniture search defaults to **Amazon through Exa**. Add `EXA_API_KEY` to the server `.env`; the explicit source selector also offers the original curated IKEA catalog. Only Amazon product pages are admitted. Source-quoted USD prices contribute to the subtotal; missing prices show “Check price” and are excluded, so the subtotal is not a complete budget estimate when prices are missing. Confirm prices, availability and dimensions at Amazon.
+
+The microphone beside either input records up to 45 seconds. Stop to transcribe with OpenAI, review the text, then send the direction or run the search. Add `OPENAI_API_KEY` to `.env`. Audio goes through the backend to OpenAI's `gpt-4o-mini-transcribe`; the app does not persist recordings. Cancel discards an active recording. Permission failures leave typing available. [Actual OpenAI → Exa → Neo4j verification](docs/evidence/voice-and-player.md).
+
+Browser checks for these controls: `node scripts/test-player-controls.cjs` after installing `tooling`. This uses a mocked provider and synthetic video, never disguised as live integration evidence. The separate `node scripts/test-live-player.cjs --live` command explicitly uses one paid Orbis session and ends it after checking pause, paused steering and resume.
+
 ## Integration access
 
 All service credentials belong in the root `.env`, which is ignored by Git. Use `.env.example` for the precise variable names. Never put a service key in a `VITE_*` variable.
 
 - **Reactor / Orbis:** authorized Reactor API key and access to the Orbis model. The backend issues scoped access for the browser streaming SDK. A real browser session and two visible direction changes are recorded in the verification evidence.
+- **Exa / Amazon:** `EXA_API_KEY` enables real Amazon product discovery with source links and quoted prices where available.
+- **OpenAI:** `OPENAI_API_KEY` enables speech-to-text for both room directions and furniture searches.
 - **Neo4j:** use the local Docker instance or configure an accessible server. The graph stores connected room and product context. UI and health responses distinguish Neo4j from any local fallback.
 - **Ambiguous:** authorized workspace access for reads and approved document writes containing the design brief and shopping table. A successful save must return inspectable identifiers/links.
 - **Qoder:** optional developer tooling, not a browser dependency. Create a token at [Qoder integrations](https://qoder.com/account/integrations). Qoder authored five independently passing journey tests; see [engineering evidence](docs/evidence/qoder.md).

@@ -35,3 +35,11 @@ Provider references used for implementation:
 - [Ambiguous recipes](https://www.ambiguous.ai/agents/recipes): inspectable `https://app.ambiguous.ai/docs/{id}` links.
 
 Run local contract tests with `.venv/bin/python -m pytest backend -q`. Mocked provider tests prove contract and failure handling only; they are not evidence of real provider access.
+
+## Amazon search and voice input
+
+`POST /api/rooms/{id}/recommendations` accepts `{ "source": "amazon", "query": "wood side table" }` for live Exa search. Omitting source preserves the curated catalog contract; the browser defaults to Amazon explicitly. Search uses `EXA_API_KEY`, only admits Amazon ASIN product URLs, filters unrelated item types/kept furniture, and routes candidates through the same budget/graph selection. `products[].price` may be null. `unpriced_count` identifies prices omitted from `total`; neither zero cost nor complete budget fit is inferred. Source URL, quote and retrieval time travel with each result. A changed brief invalidates in-flight results.
+
+`POST /api/transcriptions` accepts multipart `file` audio (WebM, MP4, MP3, WAV or Ogg), at most 12 MB, and returns `{text, provider, model}`. `OPENAI_API_KEY` remains server-side; recordings are passed in memory to OpenAI and are not persisted. The browser limits recordings to 45 seconds and lets the user review text before search/direction. Missing keys, denied access, rate limits and malformed responses are explicit errors.
+
+References: [Exa search contract](https://exa.ai/docs/reference/search-api-guide-for-coding-agents), [OpenAI transcription](https://developers.openai.com/api/docs/guides/speech-to-text).

@@ -4,7 +4,7 @@ Independent review on September 12, 2026, covering the final local package build
 
 ## Package integrity and portability
 
-Each of the three standalone packages contains the same reviewable source and public artifacts. Each package’s backend/frontend SHA-256 was recomputed from actual bytes and matches both `publication.json` and the canonical source:
+Each of the three standalone packages contains the same reviewable source and public artifacts. The original approved-save package SHA-256 was recomputed from actual bytes and matched both `publication.json` and the canonical source at that release:
 
 `149c2c96f5bd049834eaa72ae98210ce3175bbb5453057c806d63167156898b8`
 
@@ -48,3 +48,11 @@ The approved GitHub publication pass successfully pushed all three public reposi
 The final approved-save update includes the restricted-visibility fix, uncertain-write reconciliation, five additional recovery tests (23 backend tests passing in total), and the independently verified saved brief. Its 120-second demo and five-page PDF include the actual approved-save result. Source manifests now contain 25 backend/frontend files, including `backend/test_save_recovery.py`; the SHA-256 above covers their final bytes. The publication step again scans canonical and standalone staged blobs and checks package ZIP bytes against committed content before updating the existing public repositories without force pushes.
 
 Final local readiness also passed after the existing Docker/Neo4j instance recovered: frontend HTTP 200, backend health HTTP 200, Neo4j connected, and Ambiguous connected. The [runtime recovery receipt](runtime-recovery.json) records preserved database identity and graph relationships; recovery changed no source files or volumes.
+
+## Fullscreen and voice-search update
+
+The subsequent feature release adds actual Orbis pause/resume, fullscreen direction controls, Exa Amazon discovery and OpenAI transcription. Its canonical backend/frontend source manifest contains 28 files with SHA-256:
+
+`04492bb952b81ecbaeca9bb739b7a614c3ecb862396b5944817b87479bdc03d2`
+
+The current suite passes 33 backend tests. Actual provider receipts, browser checks and screenshots are linked from the [feature verification](voice-and-player.md). The original five-page PDF and two-minute MP4 remain the historical sprint artifacts. Publication rebuilding validates local Markdown links and privately scans all configured credentials; the staged-byte audit and remote tree comparison are repeated for each of the three existing repositories.
