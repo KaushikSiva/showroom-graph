@@ -12,9 +12,9 @@ Run `python3 scripts/build-publication.py` from the canonical repository to prod
 
 The literal local Docker development password `showroom-local-dev` is an intentional public default. Its ports bind to 127.0.0.1. It is the only credential-value exception in the publication scan; configured Reactor, Ambiguous, Qoder or custom database secrets are never exempt.
 
-Cross-event eligibility was confirmed by the participant on September 12, 2026. See the [confirmation and sources](evidence/event-eligibility.md). The participant approved these three public GitHub destinations. Publication is being prepared; repository links are destinations until their verified publication is recorded below. Nothing in these presentation variants implies three independent builds, award wins or hosted application deployment.
+Cross-event eligibility was confirmed by the participant on September 12, 2026. See the [confirmation and sources](evidence/event-eligibility.md). The participant approved these three public GitHub destinations, and all three repositories were published on September 12, 2026. Remote `main` references were verified after successful pushes; see the [publication evidence](evidence/github-publication.json). Nothing in these presentation variants implies three independent builds, award wins or hosted application deployment.
 
-| Presentation | Approved public repository |
+| Presentation | Published public repository |
 |---|---|
 | Canonical live video | [KaushikSiva/showroom](https://github.com/KaushikSiva/showroom) |
 | Ambiguous coworker | [KaushikSiva/showroom-coworker](https://github.com/KaushikSiva/showroom-coworker) |

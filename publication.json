@@ -19,7 +19,8 @@
     "ambiguous-coworker": "https://github.com/KaushikSiva/showroom-coworker",
     "qoder-neo4j": "https://github.com/KaushikSiva/showroom-graph"
   },
-  "publication_status": "prepared for approved public GitHub destination",
+  "publication_status": "published public GitHub repository",
+  "published_at": "2026-09-12T20:22:49.989056+00:00",
   "canonical_project": "SHOWROOM",
   "same_codebase": true,
   "source_sha256": "67a90ac54ff9415cb7e82f58012e8564e7133422cfcbf2f8d83bee19451bd41c",
@@ -49,5 +50,5 @@
     "frontend/tsconfig.json",
     "frontend/vite.config.ts"
   ],
-  "canonical_local_commit": "ce4203f17679f8190d66679ab3bfe4751a39c9e7"
+  "canonical_local_commit": "22b8bbfa4e95b533561a571dd1665e5a9a068559"
 }
