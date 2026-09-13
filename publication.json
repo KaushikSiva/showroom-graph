@@ -65,5 +65,5 @@
     "frontend/tsconfig.json",
     "frontend/vite.config.ts"
   ],
-  "canonical_local_commit": "8b11a8fb360b592998d3a1dfb23aae0f0678e097"
+  "canonical_local_commit": "c40df127159b16ca56aa197d282319740aa88df6"
 }
